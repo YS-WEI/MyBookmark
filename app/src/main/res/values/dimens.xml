@@ -1,0 +1,27 @@
+<resources>
+    <!-- Multiples of four -->
+    <dimen name="x0">2dp</dimen>
+    <dimen name="x1">4dp</dimen>
+    <dimen name="x2">8dp</dimen>
+    <dimen name="x3">12dp</dimen>
+    <dimen name="x4">16dp</dimen>
+    <dimen name="x5">20dp</dimen>
+    <dimen name="x6">24dp</dimen>
+    <dimen name="x7">28dp</dimen>
+    <dimen name="x8">32dp</dimen>
+    <dimen name="x9">36dp</dimen>
+    <dimen name="x10">40dp</dimen>
+    <dimen name="x11">44dp</dimen>
+    <dimen name="x12">48dp</dimen>
+    <dimen name="x13">52dp</dimen>
+    <dimen name="x14">56dp</dimen>
+    <dimen name="x15">60dp</dimen>
+    <dimen name="x16">64dp</dimen>
+    <dimen name="x17">68dp</dimen>
+    <dimen name="x18">72dp</dimen>
+
+    <!--Text Size-->
+    <dimen name="title_text_size">20sp</dimen>
+    <dimen name="content_text_size">14sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>

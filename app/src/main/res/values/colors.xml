@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#002848</color>
+    <color name="colorPrimaryDark">@android:color/black</color>
+    <color name="colorAccent">#122447</color>
+
+    <color name="colorTextPrimary">@color/colorAccent</color>
+    <color name="colorTextSub">#9A9A9A</color>
+
+    <!--backgroud-->
+    <color name="colorBackgroudPrimary">@android:color/white</color>
+    <color name="colorBackgroudDark">#F3F3F3</color>
+
+    <!-- tab -->
+    <color name="colorTabTextUnSelect">@color/colorTextSub</color>
+    <color name="colorTabTextSelected">@color/colorTextPrimary</color>
+    <color name="transparent_dark">#77000000</color>
+</resources>
