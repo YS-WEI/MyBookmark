@@ -4,6 +4,7 @@ import androidx.room.*
 import com.example.mybookmark.db.model.Mark
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 @Dao
 interface MarkDao {
@@ -17,6 +18,10 @@ interface MarkDao {
 //    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
 //            "last_name LIKE :last LIMIT 1")
 //    fun findByName(first: String, last: String): Mark
+
+
+    @Query("SELECT * FROM mark WHERE url IN (:url)")
+    fun check(url: String): Single<List<Mark>>
 
     @Insert
     fun insert(vararg users: Mark): Completable

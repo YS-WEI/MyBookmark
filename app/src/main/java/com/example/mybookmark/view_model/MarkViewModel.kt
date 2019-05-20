@@ -25,6 +25,7 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
 
     private var compositeDisposable:CompositeDisposable = CompositeDisposable()
     private var marksLiveData: MutableLiveData<List<Mark>> = MutableLiveData()
+    private var showMessageLiveData: MutableLiveData<String> = MutableLiveData()
 
     fun loadMadks() {
         val disposable = repository.getMarkAll()
@@ -47,22 +48,24 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
         return marksLiveData
     }
 
-    fun addMark(url: String) {
+    fun getShowMessageLiveData(): LiveData<String> {
+        return showMessageLiveData
+    }
 
-        var mark: Mark = Mark(url=url)
-        parser(mark).subscribeOn(Schedulers.io())
+    fun addMark(mark: Mark) {
+
+        repository.check(mark.url).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                markUpdate ->
+            .subscribe({list ->
+                if(list.size > 0) {
+                    showMessageLiveData.value = mark.url +"\n漫畫已經存在"
+                } else {
+                    startAddMark(mark)
+                }
 
-                compositeDisposable.add(repository.insert(markUpdate)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({},
-                        { error -> Log.e("addMark", "Unable to insert", error) }))
-            },
-                { error -> Log.e("parser", "parser fail", error) })
-
+            }, {
+                    error -> Log.e("check", "check fail", error)
+            })
 
 
     }
@@ -80,6 +83,21 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()
+    }
+
+    private fun startAddMark (mark: Mark) {
+        parser(mark).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                    markUpdate ->
+
+                compositeDisposable.add(repository.insert(markUpdate)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({},
+                        { error -> Log.e("addMark", "Unable to insert", error) }))
+            },
+                { error -> Log.e("parser", "parser fail", error) })
     }
 
     fun parser(mark: Mark) : Observable<Mark> {

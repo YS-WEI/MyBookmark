@@ -18,6 +18,7 @@ data class Mark(
     @ColumnInfo(name = "totalPart") var totalPart: String? = "0",
     @ColumnInfo(name = "updateDate") var updateDate: String? = "",
     @ColumnInfo(name = "lastTimeDate") var lastTimeDate: String? = "",
+    @ColumnInfo(name = "comicType") var comicType: Int? = null,
     @ColumnInfo(name = "type") var type: String? = "",
     @ColumnInfo(name = "isReaded") var isReaded: Boolean? = true
 ) : Parcelable {
@@ -30,6 +31,7 @@ data class Mark(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
+        parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readString(),
         parcel.readValue(Boolean::class.java.classLoader) as? Boolean
     ) {
@@ -44,6 +46,7 @@ data class Mark(
         parcel.writeString(totalPart)
         parcel.writeString(updateDate)
         parcel.writeString(lastTimeDate)
+        parcel.writeValue(comicType)
         parcel.writeString(type)
         parcel.writeValue(isReaded)
     }
