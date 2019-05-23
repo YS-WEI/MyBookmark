@@ -1,22 +1,16 @@
 package com.example.mybookmark.view_model
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.mybookmark.MarkDatebaseRepository
 import com.example.mybookmark.db.model.Mark
-import com.example.mybookmark.util.ParserWebContentUtils
-import io.reactivex.Completable
+import com.example.mybookmark.parser.WebParserUtils
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.CompositeDisposable
-import org.jsoup.Jsoup
-import java.io.IOException
 
 
 class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel() {
@@ -104,7 +98,7 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
         return Observable.create {
             subscriber ->
 
-            ParserWebContentUtils.startParser(mark)
+            WebParserUtils.startParserInfo(mark)
             if(mark != null ) {
                 subscriber.onNext(mark)
                 subscriber.onComplete()

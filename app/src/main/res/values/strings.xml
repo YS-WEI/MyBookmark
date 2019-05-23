@@ -3,4 +3,5 @@
 
 
     <string name="show_part_format">%s / %s</string>
+    <string name="show_date_format">上次閱讀: %s / 更新時間: %s</string>
 </resources>

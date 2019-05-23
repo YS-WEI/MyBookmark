@@ -14,13 +14,14 @@ data class Mark(
     @ColumnInfo(name = "name") var name: String? = "",
     @ColumnInfo(name = "url") var url: String,
     @ColumnInfo(name = "image") var image: String? = "",
-    @ColumnInfo(name = "readPart") var readPart: String? = "0",
-    @ColumnInfo(name = "totalPart") var totalPart: String? = "0",
-    @ColumnInfo(name = "updateDate") var updateDate: String? = "",
-    @ColumnInfo(name = "lastTimeDate") var lastTimeDate: String? = "",
+    @ColumnInfo(name = "readEpisode") var readEpisode: String? = "0",
+    @ColumnInfo(name = "totalEpisode") var totalEpisode: String? = "0",
+    @ColumnInfo(name = "updateDate") var updateDate: String? = "", //更新時間
+    @ColumnInfo(name = "lastTimeDate") var lastTimeDate: String? = "", //上次閱讀時間
     @ColumnInfo(name = "comicType") var comicType: Int? = null,
     @ColumnInfo(name = "type") var type: String? = "",
     @ColumnInfo(name = "isReaded") var isReaded: Boolean? = true
+
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readValue(Int::class.java.classLoader) as? Int,
@@ -42,8 +43,8 @@ data class Mark(
         parcel.writeString(name)
         parcel.writeString(url)
         parcel.writeString(image)
-        parcel.writeString(readPart)
-        parcel.writeString(totalPart)
+        parcel.writeString(readEpisode)
+        parcel.writeString(totalEpisode)
         parcel.writeString(updateDate)
         parcel.writeString(lastTimeDate)
         parcel.writeValue(comicType)

@@ -10,14 +10,22 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.mybookmark.db.model.Episode
 import com.example.mybookmark.db.model.Mark
+import com.example.mybookmark.view_model.MarkViewModel
+import com.example.mybookmark.view_model.ViewModelFactory
+import com.example.mybookmark.view_model.WebViewModel
 
 
 class WebActivity : AppCompatActivity() {
@@ -41,12 +49,19 @@ class WebActivity : AppCompatActivity() {
     private lateinit var mInputUrl: Uri
     private var mInpoutMark : Mark? = null
 
+    private lateinit var mViewModelFactory: ViewModelFactory
+    private lateinit var mWebViewModel: WebViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
         if(intent.hasExtra(URL_KEY)) {
             mInpoutMark = intent.getParcelableExtra(URL_KEY)
+            if(mInpoutMark != null) {
+                setViewModel(mInpoutMark!!)
+            }
         }
+
 
         mWebView = findViewById(R.id.web_view)
         mProgressBar = findViewById(R.id.progress_bar)
@@ -65,9 +80,24 @@ class WebActivity : AppCompatActivity() {
         if(mInpoutMark != null) {
             mInputUrl = Uri.parse(mInpoutMark!!.url)
             Log.d("mInputUrl url host:", mInputUrl.host)
-            mWebView.loadUrl(mInpoutMark!!.url);
+            mWebView.loadUrl(mInpoutMark!!.url)
         }
 
+    }
+
+    private fun setViewModel(mark: Mark) {
+
+        mViewModelFactory = Injection.provideMarkViewModelFactory(this)
+        mWebViewModel = ViewModelProviders.of(this, mViewModelFactory).get(WebViewModel::class.java)
+
+        mWebViewModel.setMark(mark)
+
+        mWebViewModel.getEpisodesData().observe(this,
+            Observer<List<Episode>> { list ->
+                run {
+                  showToast("Episode number: ${list.size}")
+                }
+            })
     }
 
     private fun initRefresh() {
@@ -116,25 +146,37 @@ class WebActivity : AppCompatActivity() {
             }
 
         }
+
+        override fun onReceivedTitle(view: WebView?, title: String?) {
+            super.onReceivedTitle(view, title)
+
+            Log.d("onReceivedTitle", title);
+        }
     }
 
     private val mWebClient: WebViewClient = object : WebViewClient() {
         @SuppressWarnings("deprecation")
         override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
             val uri = Uri.parse(url)
+            Log.d("url", url);
             // Returning false means that you are going to load this url in the webView itself
             if(!checkDomain(uri)) {
                 return true
             }
+            mWebViewModel.nextUrl(url)
+
             return false
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val uri = request.url
+            Log.d("url", request.url.path);
             if(!checkDomain(uri)) {
                 return true
             }
+
+            mWebViewModel.nextUrl(request.url.path)
 
             return false
         }
@@ -171,5 +213,12 @@ class WebActivity : AppCompatActivity() {
     private fun checkDomain(uri: Uri): Boolean {
         return mInputUrl.host.equals(uri.host, true)
     }
+
+    fun showToast(text: String) {
+        val toast = Toast.makeText(this, text, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER, 0, 0)
+        toast.show()
+    }
+
 }
 

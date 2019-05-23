@@ -2,7 +2,7 @@ package com.example.mybookmark
 
 import android.content.Context
 import com.example.mybookmark.db.AppDatabase
-import com.example.mybookmark.view_model.MarkViewModelFactory
+import com.example.mybookmark.view_model.ViewModelFactory
 
 object Injection {
 
@@ -13,9 +13,9 @@ object Injection {
         return repository;
     }
 
-    fun provideMarkViewModelFactory(context: Context): MarkViewModelFactory {
+    fun provideMarkViewModelFactory(context: Context): ViewModelFactory {
         val dataSource = provideMarkDatebaseRepository(context)
-        return MarkViewModelFactory(dataSource)
+        return ViewModelFactory(dataSource)
     }
 
 }

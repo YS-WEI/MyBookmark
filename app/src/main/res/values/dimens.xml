@@ -22,6 +22,7 @@
 
     <!--Text Size-->
     <dimen name="title_text_size">20sp</dimen>
-    <dimen name="content_text_size">14sp</dimen>
+    <dimen name="content_text_size">12sp</dimen>
+    <dimen name="min_text_size">8sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 </resources>

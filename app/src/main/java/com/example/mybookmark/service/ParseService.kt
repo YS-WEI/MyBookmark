@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import android.util.Log
 import com.example.mybookmark.db.AppDatabase
-import com.example.mybookmark.util.ParserWebContentUtils
+import com.example.mybookmark.parser.WebParserUtils
 
 class ParseService: IntentService(SERVICE_NAME) {
 
@@ -22,7 +22,7 @@ class ParseService: IntentService(SERVICE_NAME) {
 
         marks.forEach { mark -> run{
 
-            ParserWebContentUtils.startParser(mark)
+            WebParserUtils.startParserInfo(mark)
 
             markDao.updateByService(mark)
         } }

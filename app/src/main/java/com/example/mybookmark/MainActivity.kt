@@ -2,6 +2,7 @@ package com.example.mybookmark
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +24,7 @@ import com.example.mybookmark.databinding.DialogAddMarkBinding
 import com.example.mybookmark.model.ComicType
 import com.example.mybookmark.service.ParseService
 import com.example.mybookmark.view_model.MarkViewModel
-import com.example.mybookmark.view_model.MarkViewModelFactory
+import com.example.mybookmark.view_model.ViewModelFactory
 import android.view.Gravity
 import android.widget.Toast
 
@@ -34,7 +35,7 @@ import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var markViewModelFactory: MarkViewModelFactory
+    private lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var markViewModel: MarkViewModel
     private lateinit var mBinding: ActivityMainBinding
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         mBinding.gridViewMarks.numColumns = 3
         mBinding.gridViewMarks.adapter = mAdapter
+        mBinding.gridViewMarks.horizontalSpacing = 20
         mBinding.gridViewMarks.onItemClickListener = GridOnItemClickListener;
         
 
@@ -99,8 +101,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setViewModel() {
 
-        markViewModelFactory = Injection.provideMarkViewModelFactory(this)
-        markViewModel = ViewModelProviders.of(this, markViewModelFactory).get(MarkViewModel::class.java)
+        viewModelFactory = Injection.provideMarkViewModelFactory(this)
+        markViewModel = ViewModelProviders.of(this, viewModelFactory).get(MarkViewModel::class.java)
         markViewModel.loadMadks()
 
 
@@ -149,16 +151,21 @@ class MainActivity : AppCompatActivity() {
 
         dialogBinding.buttonConfirm.setOnClickListener {
             run {
+                var comicType: ComicType? = null
                 val selectTypeId = dialogBinding.radioComicType.checkedRadioButtonId;
-                val selected: View = dialogBinding.radioComicType.findViewById(selectTypeId)
-                val comicType: ComicType = selected.tag as ComicType
+
+                if(selectTypeId != null && selectTypeId != -1) {
+                    val selected: View = dialogBinding.radioComicType.findViewById(selectTypeId)
+                    comicType = selected.tag as ComicType
+                }
 
                 val urlString = dialogBinding.editUrl.text
+                if(comicType != null && !TextUtils.isEmpty(urlString)) {
 
-
-                var mark = Mark(url=urlString.toString(), comicType = comicType.value)
-                markViewModel.addMark(mark)
-                mAlertDialog.dismiss()
+                    var mark = Mark(url = urlString.toString(), comicType = comicType.value)
+                    markViewModel.addMark(mark)
+                    mAlertDialog.dismiss()
+                }
             }
         }
     }
@@ -167,8 +174,6 @@ class MainActivity : AppCompatActivity() {
         if (radioGroup == null) {
             return
         }
-
-        val defType = ComicType.valueOfEnum(0)
 
         for (c in ComicType.values()) {
             val radioButton = RadioButton(this)

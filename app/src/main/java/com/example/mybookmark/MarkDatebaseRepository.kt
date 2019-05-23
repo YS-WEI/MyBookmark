@@ -25,4 +25,8 @@ class MarkDatebaseRepository constructor(markDao: MarkDao){
     fun check(url: String) : Single<List<Mark>> {
         return markDao.check(url)
     }
+
+    fun updateByNoWait(mark: Mark):Completable {
+        return markDao.update(mark)
+    }
 }
