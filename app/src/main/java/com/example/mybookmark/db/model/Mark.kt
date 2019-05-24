@@ -14,10 +14,10 @@ data class Mark(
     @ColumnInfo(name = "name") var name: String? = "",
     @ColumnInfo(name = "url") var url: String,
     @ColumnInfo(name = "image") var image: String? = "",
-    @ColumnInfo(name = "readEpisode") var readEpisode: String? = "0",
-    @ColumnInfo(name = "totalEpisode") var totalEpisode: String? = "0",
-    @ColumnInfo(name = "updateDate") var updateDate: String? = "", //更新時間
-    @ColumnInfo(name = "lastTimeDate") var lastTimeDate: String? = "", //上次閱讀時間
+    @ColumnInfo(name = "readEpisode") var readEpisode: String? = "", //（後面
+    @ColumnInfo(name = "totalEpisode") var totalEpisode: String? = "",
+    @ColumnInfo(name = "updateDate") var updateDate: String = "19000101", //更新時間
+    @ColumnInfo(name = "lastTimeDate") var lastTimeDate: String = "18990101", //上次閱讀時間 （後面
     @ColumnInfo(name = "comicType") var comicType: Int? = null,
     @ColumnInfo(name = "type") var type: String? = "",
     @ColumnInfo(name = "isReaded") var isReaded: Boolean? = true

@@ -36,4 +36,10 @@ object ShareFun {
         val formatter = SimpleDateFormat(showDateFormat)
         return formatter.format(parser.parse(date))
     }
+
+    fun converDate(date : Long): String {
+        var dateTime = Date(date)
+        val formatter = SimpleDateFormat(dateFormat)
+        return formatter.format(date)
+    }
 }

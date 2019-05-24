@@ -6,6 +6,7 @@ import android.util.Log
 import com.example.mybookmark.db.model.Episode
 import com.example.mybookmark.db.model.Mark
 import com.example.mybookmark.model.WebType
+import com.example.mybookmark.parser.webs.SoudongmanWebParser
 import com.example.mybookmark.parser.webs.TohomhWebParser
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -29,15 +30,19 @@ object WebParserUtils {
             return mark
         }
 
+        val xx = doc.toString();
         val uri = Uri.parse(mark.url)
         val type = WebType.domainOfEnum(uri.host) ?: return null
 
         when(type) {
             WebType.tohomh123 -> run {
-                val tohomhWebParser = TohomhWebParser()
-                return tohomhWebParser.information(doc, mark)
+                val parser = TohomhWebParser()
+                return parser.information(doc, mark)
             }
-            WebType.soudongman -> return mark
+            WebType.soudongman ->  run {
+                val parser = SoudongmanWebParser()
+                return parser.information(doc, mark)
+            }
             else -> return mark
         }
 
@@ -75,10 +80,13 @@ object WebParserUtils {
         var list: ArrayList<Episode>? = null
         when(type) {
             WebType.tohomh123 -> run {
-                val tohomhWebParser = TohomhWebParser()
-                list = tohomhWebParser.episode(doc!!)
+                val parser = TohomhWebParser()
+                list = parser.episode(doc!!)
             }
-            WebType.soudongman -> list = null
+            WebType.soudongman -> run {
+                val parser = SoudongmanWebParser()
+                list = parser.episode(doc!!)
+            }
             else -> list = null
         }
 

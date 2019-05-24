@@ -61,26 +61,6 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(this, ParseService::class.java)
         startService(intent)
-
-
-
-        mBinding.buttonAdd.setOnClickListener {
-//
-//            markViewModel.addMark("https://m.tohomh123.com/chongshengzhidoushixiuxian/")
-            var item = Mark(url="https://ld3-gc-wl.prdaldbwla1.com/mobile?bucode=ldr-demo-t&token=249384444921196544&language=en-gb&table=0000&lobbyUrl=lobbyUrl&logoutUrl=logoutUrl")
-            WebActivity.open(this, item)
-//            var intent = Intent(this, WebActivity::class.java)
-//            startActivity(intent)
-//            showAddMark()
-        }
-
-        mBinding.buttonDel.setOnClickListener {
-            if(mList != null && mList!!.size > 0) {
-                val mark = mList!!.get(mList!!.size - 1)
-                markViewModel.delMark(mark)
-            }
-        }
-//        test()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

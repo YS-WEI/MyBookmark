@@ -33,14 +33,14 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
-    <style name="CommonTitleText">
-        <item name="android:textColor">@color/colorTextPrimary</item>
-        <item name="android:textSize">@dimen/title_text_size</item>
-    </style>
-
-    <style name="CommonContentText">
+    <style name="CommonNameText">
         <item name="android:textColor">@color/colorTextPrimary</item>
         <item name="android:textSize">@dimen/content_text_size</item>
+    </style>
+
+    <style name="CommonEpisodeText">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">@dimen/general_text_size</item>
     </style>
 
     <style name="CommonMinText">

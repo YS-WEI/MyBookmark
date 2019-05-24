@@ -28,15 +28,12 @@ class TohomhWebParser: WebParser(){
                     if(string.indexOf("更新时间") != -1) {
                         var updateDate = WebParserUtils.parserIntFormString(string)
                         if(updateDate != null) {
-                            Log.d("runParserWeb", "updateDate: $updateDate")
                             mark.updateDate = "$updateDate"
                         }
                     }
 
                     if(element.hasClass("bottom")) {
                         val totalEpisode = element.text()
-
-                        Log.d("runParserWeb", "totalPart: $totalEpisode")
                         mark.totalEpisode = totalEpisode.trim()
                     }
                 }
@@ -47,9 +44,6 @@ class TohomhWebParser: WebParser(){
         if (imageElements != null) {
             val imgUrlElement = imageElements.select("img")
             if(imgUrlElement != null) {
-                Log.d("runParserWeb", "img src: " + imgUrlElement.attr("src"))
-                Log.d("runParserWeb", "img title: " + imgUrlElement.attr("title"))
-                Log.d("runParserWeb", "img alt: " + imgUrlElement.attr("alt"))
 
                 val imgTitle = imgUrlElement.attr("title")
                 val imgAlt = imgUrlElement.attr("alt")
@@ -72,7 +66,6 @@ class TohomhWebParser: WebParser(){
 
         mark.type = WebType.tohomh123.domain
 
-        Log.d("runParserWeb", mark.toString())
         return mark
     }
 
@@ -92,7 +85,6 @@ class TohomhWebParser: WebParser(){
                     episode.title = item.text()
                     episode.url = item.attr("href")
 
-                    Log.d("runParserWeb", "items title: ${episode.title} , url: ${episode.url}")
                     episodeList.add(episode)
                 }
 

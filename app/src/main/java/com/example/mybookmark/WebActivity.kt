@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -23,7 +24,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.mybookmark.db.model.Episode
 import com.example.mybookmark.db.model.Mark
-import com.example.mybookmark.view_model.MarkViewModel
 import com.example.mybookmark.view_model.ViewModelFactory
 import com.example.mybookmark.view_model.WebViewModel
 
@@ -47,7 +47,7 @@ class WebActivity : AppCompatActivity() {
     private lateinit var mSwipeRefresh: SwipeRefreshLayout
     private lateinit var mProgressBar: ProgressBar
     private lateinit var mInputUrl: Uri
-    private var mInpoutMark : Mark? = null
+    private lateinit var mInputMark : Mark
 
     private lateinit var mViewModelFactory: ViewModelFactory
     private lateinit var mWebViewModel: WebViewModel
@@ -56,9 +56,9 @@ class WebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
         if(intent.hasExtra(URL_KEY)) {
-            mInpoutMark = intent.getParcelableExtra(URL_KEY)
-            if(mInpoutMark != null) {
-                setViewModel(mInpoutMark!!)
+            mInputMark = intent.getParcelableExtra(URL_KEY)
+            if(mInputMark != null) {
+                setViewModel(mInputMark)
             }
         }
 
@@ -77,10 +77,10 @@ class WebActivity : AppCompatActivity() {
         mWebView.webViewClient = mWebClient
         mWebView.webChromeClient = mWebChromeClient
 
-        if(mInpoutMark != null) {
-            mInputUrl = Uri.parse(mInpoutMark!!.url)
+        if(mInputMark != null) {
+            mInputUrl = Uri.parse(mInputMark!!.url)
             Log.d("mInputUrl url host:", mInputUrl.host)
-            mWebView.loadUrl(mInpoutMark!!.url)
+            mWebView.loadUrl(mInputMark!!.url)
         }
 
     }
@@ -176,7 +176,7 @@ class WebActivity : AppCompatActivity() {
                 return true
             }
 
-            mWebViewModel.nextUrl(request.url.path)
+            mWebViewModel.nextUrl(request.url.toString())
 
             return false
         }
@@ -202,10 +202,16 @@ class WebActivity : AppCompatActivity() {
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
+            Log.d("url", url);
         }
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
+            Log.d("url", url)
+
+//            if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
+//                mWebViewModel.nextUrl(url!!)
+//            }
 
         }
     }
