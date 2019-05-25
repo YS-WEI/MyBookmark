@@ -6,6 +6,8 @@ import android.util.Log
 import com.example.mybookmark.db.model.Episode
 import com.example.mybookmark.db.model.Mark
 import com.example.mybookmark.model.WebType
+import com.example.mybookmark.parser.webs.Gufengmh8WebParser
+import com.example.mybookmark.parser.webs.ManhuaguiWebParser
 import com.example.mybookmark.parser.webs.SoudongmanWebParser
 import com.example.mybookmark.parser.webs.TohomhWebParser
 import io.reactivex.Observable
@@ -43,6 +45,15 @@ object WebParserUtils {
                 val parser = SoudongmanWebParser()
                 return parser.information(doc, mark)
             }
+            WebType.gufengmh8 ->  run {
+                val parser = Gufengmh8WebParser()
+                return parser.information(doc, mark)
+            }
+            WebType.manhuagui ->  run {
+                val parser = ManhuaguiWebParser()
+                return parser.information(doc, mark)
+            }
+
             else -> return mark
         }
 
@@ -87,6 +98,15 @@ object WebParserUtils {
                 val parser = SoudongmanWebParser()
                 list = parser.episode(doc!!)
             }
+            WebType.gufengmh8 -> run {
+                val parser = Gufengmh8WebParser()
+                list = parser.episode(doc!!)
+            }
+            WebType.manhuagui -> run {
+                val parser = ManhuaguiWebParser()
+                list = parser.episode(doc!!)
+            }
+
             else -> list = null
         }
 
