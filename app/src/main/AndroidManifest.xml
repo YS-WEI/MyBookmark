@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mybookmark">
+    package="com.siang.wei.mybookmark">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,10 +13,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-                android:name=".WebActivity"
+                android:name="com.siang.wei.mybookmark.WebActivity"
                 android:theme="@style/AppTheme.NoActionBar"
         ></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.siang.wei.mybookmark.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.ParseService" />
+        <service android:name="com.siang.wei.mybookmark.service.ParseService" />
     </application>
 
 </manifest>
