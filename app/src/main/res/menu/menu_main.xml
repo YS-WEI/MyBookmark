@@ -9,4 +9,9 @@
         android:title="新增"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_backup"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="備份"/>
+
 </menu>

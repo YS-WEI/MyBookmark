@@ -119,6 +119,40 @@ object WebParserUtils {
         }
     }
 
+    fun startParseImage(url: String): Observable<ArrayList<String>> {
+        return Observable.create {
+                subscriber -> parseImage(url, subscriber)
+        }
+    }
+
+
+    private fun parseImage(url:String, subscriber: ObservableEmitter<ArrayList<String>>) {
+
+
+        val uri = Uri.parse(url)
+        val type = WebType.domainOfEnum(uri.host) ?: run {
+            val error = Throwable("Web Type error")
+            subscriber.onError(error)
+        }
+
+        var list: ArrayList<String>? = null
+        when(type) {
+
+            WebType.gufengmh8 -> run {
+                val parser = Gufengmh8WebParser()
+                list = ArrayList()
+                parser.parseEpisodeImages(url, list!!)
+            }
+        }
+
+        if(list != null) {
+            subscriber.onNext(list!!)
+            subscriber.onComplete()
+        } else {
+            val error = Throwable("parseEpisode list is null")
+            subscriber.onError(error)
+        }
+    }
 
 
     fun parserIntFormString(string : String) :String {

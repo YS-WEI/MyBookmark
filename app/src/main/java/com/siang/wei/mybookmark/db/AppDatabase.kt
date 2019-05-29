@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.siang.wei.mybookmark.db.DatabaseKeys.Companion.DatabaseName
+import com.siang.wei.mybookmark.db.DatabaseKeys.Companion.Version
 import com.siang.wei.mybookmark.db.model.Mark
 
-@Database(entities = [Mark::class], version = 1)
+@Database(entities = [Mark::class], version = Version)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun markDao(): MarkDao
 

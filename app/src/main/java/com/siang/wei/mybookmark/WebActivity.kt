@@ -68,11 +68,29 @@ class WebActivity : AppCompatActivity() {
         initRefresh()
 
         val webSettings = mWebView.settings
+        //允许js代码
         webSettings.javaScriptEnabled = true
 
         //放缩
-        webSettings.displayZoomControls = true
-        webSettings.builtInZoomControls = true
+        webSettings.displayZoomControls = false
+        webSettings.builtInZoomControls = false
+
+        webSettings.loadWithOverviewMode = true
+        webSettings.useWideViewPort = true
+
+        //允许SessionStorage/LocalStorage存储
+        webSettings.domStorageEnabled = true
+
+        //允许缓存，设置缓存位置
+        webSettings.setAppCacheEnabled(true)
+        webSettings.setAppCachePath(this.getDir("appcache", 0).path)
+        webSettings.allowFileAccess = true
+
+        //自动加载图片
+        webSettings.loadsImagesAutomatically = true;
+
+
+
         removeJavascriptInterfaces(mWebView)
         mWebView.webViewClient = mWebClient
         mWebView.webChromeClient = mWebChromeClient

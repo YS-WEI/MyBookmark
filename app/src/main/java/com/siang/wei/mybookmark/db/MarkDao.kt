@@ -9,7 +9,7 @@ import io.reactivex.Single
 @Dao
 interface MarkDao {
 
-    @Query("SELECT * FROM mark ORDER BY lastTimeDate DESC")
+    @Query("SELECT * FROM mark ORDER BY updateDate DESC")
     fun getAll(): Flowable<List<Mark>>
 
     @Query("SELECT * FROM mark WHERE uid IN (:userIds)")

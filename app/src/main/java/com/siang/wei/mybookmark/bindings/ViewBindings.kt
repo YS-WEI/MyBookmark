@@ -38,7 +38,7 @@ object ViewBindings {
 
         if (mark.updateDate.toInt() > mark.lastTimeDate!!.toInt()) {
             view.visibility = View.VISIBLE
-        } else if(TextUtils.isEmpty(mark.readEpisode) || !mark.totalEpisode.equals(mark.readEpisode, true)) {
+        } else if(TextUtils.isEmpty(mark.readEpisode) || !(mark.totalEpisode!!.indexOf(mark.readEpisode!!) != -1 || mark.readEpisode!!.indexOf(mark.totalEpisode!!) != -1)) {
             view.setBackgroundResource(R.drawable.green_point)
             view.visibility = View.VISIBLE
         } else {

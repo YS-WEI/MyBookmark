@@ -5,8 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import com.siang.wei.mybookmark.MarkDatebaseRepository
+import com.siang.wei.mybookmark.db.DatabaseKeys
+import com.siang.wei.mybookmark.db.model.BackupDatabase
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.parser.WebParserUtils
+import com.siang.wei.mybookmark.util.BackupUtil
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -20,6 +23,7 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
     private var compositeDisposable:CompositeDisposable = CompositeDisposable()
     private var marksLiveData: MutableLiveData<List<Mark>> = MutableLiveData()
     private var showMessageLiveData: MutableLiveData<String> = MutableLiveData()
+    private var progressDialogLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     fun loadMadks() {
         val disposable = repository.getMarkAll()
@@ -46,6 +50,12 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
         return showMessageLiveData
     }
 
+    fun getProgressDialogLiveData(): LiveData<Boolean> {
+        return progressDialogLiveData
+    }
+
+
+
     fun addMark(mark: Mark) {
 
         repository.check(mark.url).subscribeOn(Schedulers.io())
@@ -65,7 +75,7 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
     }
 
     fun delMark(mark: Mark) {
-
+        repository
         compositeDisposable.add(repository.delect(mark)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -73,6 +83,26 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
                 { error -> Log.e("addMark", "Unable to delect", error) }))
     }
 
+    fun actionBackup() {
+        if(marksLiveData.value != null) {
+            val backupData = BackupDatabase(DatabaseKeys.Version, marksLiveData.value!!)
+            progressDialogLiveData.value = true
+            BackupUtil.exportDatabaseToJson(backupData, true).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ isSave ->
+                    progressDialogLiveData.value = false
+                }, { error ->
+                    Log.e("ActionBackup", "Backup fail", error)
+                    progressDialogLiveData.value = false
+                })
+
+
+        } else {
+            showMessageLiveData.value = "Data base is not data"
+        }
+
+
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -110,4 +140,17 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
 
     }
 
+
+
+    fun test(url:String) {
+
+        WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                    list ->
+                    Log.d("startParseImage", "${list}")
+
+            },
+                { error -> Log.e("parser", "parser fail", error) })
+    }
 }

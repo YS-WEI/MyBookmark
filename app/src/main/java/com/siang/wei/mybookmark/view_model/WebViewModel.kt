@@ -11,6 +11,7 @@ import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import com.siang.wei.mybookmark.util.ShareFun
+import com.siang.wei.mybookmark.util.SharedFileMethod
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -44,6 +45,11 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
     }
 
     fun parserWebEpisode() {
+        if(episodesData.value != null) {
+            return
+        }
+
+
         val mark = markData.value
         if(mark != null) {
             val url = mark.url
@@ -66,9 +72,9 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
 //
         //                episode.url.equals(url, true)
         if(episodesData.value != null) {
-           val episode = episodesData.value!!.filter { episode ->
+           val episode: Episode? = episodesData.value!!.filter { episode ->
                 equalsUrl(mark!!.url, episode.url, url)
-            }.single()
+            }.singleOrNull()
 
 
 
@@ -97,35 +103,11 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
             return false
         }
 
-        val url = combinUrl(rootUrl, episodeUrl!!)
+        val url = ShareFun.combinUrl(rootUrl, episodeUrl!!)
 
         return url.equals(currentUrl, true)
 
     }
 
-    private fun combinUrl(url: String, addUrl: String): String {
-        var uri = Uri.parse(url)
-        var addUri = Uri.parse(addUrl)
 
-        var newUrl = url
-
-        if(TextUtils.isEmpty(addUri.host) || uri.host.equals(addUri.host, true)) {
-            var pathSegments = uri.pathSegments as ArrayList<String>
-
-            addUri.pathSegments.forEach {addSeg ->
-                val match = uri.pathSegments.find { seg ->
-                    addSeg.equals(seg)
-                }
-
-                if(match == null) {
-                    newUrl = ShareFun.combinePath(newUrl, addSeg)
-                }
-            }
-
-        }
-
-
-        return newUrl
-
-    }
 }
