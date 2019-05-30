@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
+import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.view_model.ViewModelFactory
 import com.siang.wei.mybookmark.view_model.WebViewModel
 
@@ -176,34 +177,24 @@ class WebActivity : AppCompatActivity() {
         @SuppressWarnings("deprecation")
         override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
             val uri = Uri.parse(url)
-            Log.d("url", url);
             // Returning false means that you are going to load this url in the webView itself
             if(!checkDomain(uri)) {
                 return true
             }
 
-            if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
-                mWebViewModel.nextUrl(url)
-            }
-
-            return false
+            return overrideUrlAction(url)
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val uri = request.url
-            Log.d("url", request.url.path);
             if(!checkDomain(uri)) {
                 return true
             }
 
             val url = request.url.toString()
-            if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
-                mWebViewModel.nextUrl(url)
-            }
 
-
-            return false
+            return overrideUrlAction(url)
         }
 
 //        @SuppressWarnings("deprecation")
@@ -241,6 +232,30 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
+    private fun overrideUrlAction(url: String): Boolean {
+
+        val type = getWebType(url)
+        when(type) {
+            WebType.gufengmh8 -> {
+                if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
+                    val episode: Episode? = mWebViewModel.nextUrl(url)
+                    if(episode != null) {
+                        EpisodeActivity.open(this, url, episode.title!!)
+                        return true
+                    }
+                }
+
+            }
+            else -> {
+                if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
+                    mWebViewModel.nextUrl(url)
+                }
+            }
+        }
+
+        return false
+    }
+
     private fun checkDomain(uri: Uri): Boolean {
         return mInputUrl.host.equals(uri.host, true)
     }
@@ -250,6 +265,13 @@ class WebActivity : AppCompatActivity() {
         toast.setGravity(Gravity.CENTER, 0, 0)
         toast.show()
     }
+
+
+    fun getWebType(url: String): WebType? {
+        val uri = Uri.parse(url)
+        return WebType.domainOfEnum(uri.host)
+    }
+
 
 }
 

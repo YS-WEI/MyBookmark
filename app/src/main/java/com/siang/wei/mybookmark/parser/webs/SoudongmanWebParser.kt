@@ -17,7 +17,6 @@ class SoudongmanWebParser: WebParser(){
         val nameElements = doc.getElementsByClass("name")
         if(nameElements != null) {
             title = nameElements.text()
-            Log.d("runParserWeb", "title 1: ${title}")
         }
 
 
@@ -64,7 +63,6 @@ class SoudongmanWebParser: WebParser(){
 
         mark.type = WebType.soudongman.domain
 
-        Log.d("runParserWeb", mark.toString())
         return mark
     }
 
@@ -86,7 +84,6 @@ class SoudongmanWebParser: WebParser(){
                     episode.title = item.text()
                     episode.url = item.attr("href")
 
-                    Log.d("runParserWeb", "items title: ${episode.title} , url: ${episode.url}")
                     episodeList.add(episode)
                 }
 

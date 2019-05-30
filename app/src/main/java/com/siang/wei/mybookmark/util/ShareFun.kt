@@ -3,7 +3,8 @@ package com.siang.wei.mybookmark.util
 import android.net.Uri
 import android.os.Build
 import android.text.TextUtils
-import java.io.File
+import android.util.Log
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -89,4 +90,31 @@ object ShareFun {
 
     }
 
+
+    fun mergeUrl(url: String, newUrl: String): String {
+        var uri = Uri.parse(url)
+        var newUri = Uri.parse(newUrl)
+
+        if(TextUtils.isEmpty(newUri.host) || uri.host.equals(newUri.host, true)) {
+            if(newUri.pathSegments.size > 0 && uri.pathSegments.size > 0) {
+                if(newUri.pathSegments[0].equals(uri.pathSegments[0], true)) {
+                    var host = url.replace(uri.path, "")
+
+                    return SharedFileMethod.combinePath(host, newUri.path)
+                } else {
+                    if(uri.lastPathSegment.indexOf(".html") != -1) {
+                        return url.replace(uri.lastPathSegment, newUri.lastPathSegment)
+                    } else {
+                        return combinUrl(url, newUrl)
+                    }
+                }
+            } else {
+                return newUrl
+            }
+        } else {
+            return newUrl
+        }
+
+
+    }
 }

@@ -1,6 +1,5 @@
 package com.siang.wei.mybookmark.view_model
 
-import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -11,7 +10,6 @@ import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import com.siang.wei.mybookmark.util.ShareFun
-import com.siang.wei.mybookmark.util.SharedFileMethod
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -64,13 +62,9 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
         }
     }
 
-    fun nextUrl(url: String) {
-        var mark: Mark? = markData.value ?: return
-        //        Log.d("nextUrl", "url: ${url}")
-//        Log.d("nextUrl", "pathSegments: ${uri.pathSegments}")
-//        Log.d("nextUrl", "path: ${uri.path}")
-//
-        //                episode.url.equals(url, true)
+    fun nextUrl(url: String): Episode? {
+        var mark: Mark? = markData.value ?: return null
+
         if(episodesData.value != null) {
            val episode: Episode? = episodesData.value!!.filter { episode ->
                 equalsUrl(mark!!.url, episode.url, url)
@@ -83,10 +77,11 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
                 mark!!.readEpisode = episode.title
                 mark!!.lastTimeDate = ShareFun.getDate()
                 updateMark(mark)
+                return episode
             }
 
         }
-
+        return null
     }
 
     fun updateMark(mark: Mark) {
@@ -107,6 +102,21 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
 
         return url.equals(currentUrl, true)
 
+    }
+
+    ////
+
+
+    fun parseAllImage(url:String) {
+
+        WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                    list ->
+                Log.d("startParseImage", "${list}")
+
+            },
+                { error -> Log.e("parser", "parser fail", error) })
     }
 
 

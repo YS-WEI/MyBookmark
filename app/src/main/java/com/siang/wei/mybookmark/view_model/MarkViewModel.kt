@@ -140,17 +140,4 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
 
     }
 
-
-
-    fun test(url:String) {
-
-        WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                    list ->
-                    Log.d("startParseImage", "${list}")
-
-            },
-                { error -> Log.e("parser", "parser fail", error) })
-    }
 }

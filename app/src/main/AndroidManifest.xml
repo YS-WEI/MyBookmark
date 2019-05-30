@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.siang.wei.mybookmark.EpisodeActivity">
+        </activity>
         <service android:name="com.siang.wei.mybookmark.service.ParseService" />
     </application>
 

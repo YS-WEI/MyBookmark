@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
 //        mGoogleDriveService = GoogleDriveService()
 //        mGoogleDriveService.loginGoogle(this)
 
-//        val intent = Intent(this, ParseService::class.java)
-//        startService(intent)
+        val intent = Intent(this, ParseService::class.java)
+        startService(intent)
 
     }
 
@@ -97,8 +97,6 @@ class MainActivity : AppCompatActivity() {
         viewModelFactory = Injection.provideMarkViewModelFactory(this)
         markViewModel = ViewModelProviders.of(this, viewModelFactory).get(MarkViewModel::class.java)
         markViewModel.loadMadks()
-
-        markViewModel.test("https://m.gufengmh8.com/manhua/meinvdaxiaojiedejiangshigaoshou/428716.html")
 
         markViewModel.getMarksLiveData().observe(this,
             Observer<List<Mark>> { marks ->

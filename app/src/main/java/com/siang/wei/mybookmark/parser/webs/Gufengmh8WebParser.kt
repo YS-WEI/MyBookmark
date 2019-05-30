@@ -1,5 +1,6 @@
 package com.siang.wei.mybookmark.parser.webs
 
+import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
@@ -12,6 +13,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
+import java.lang.Exception
 
 class Gufengmh8WebParser: WebParser(){
 
@@ -134,7 +136,7 @@ class Gufengmh8WebParser: WebParser(){
             }
 
             if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
-                val nextUrl = ShareFun.combinUrl("https://m.gufengmh8.com/", episodeImageData.nextUrl!!)
+                val nextUrl = ShareFun.mergeUrl(url, episodeImageData.nextUrl!!)
                 parseEpisodeImages(nextUrl, imageList)
             }
 
@@ -155,7 +157,16 @@ class Gufengmh8WebParser: WebParser(){
                     val text = linkElement.text()
                     if(!TextUtils.isEmpty(text)) {
                         if(text.equals("下一页", true)) {
+
                             nextUrl = linkElement.attr("href")
+                            try {
+                                var uri = Uri.parse(nextUrl);
+                                if(uri.path == null) {
+                                    nextUrl = ""
+                                }
+                            } catch (e: Exception) {
+                                nextUrl = ""
+                            }
                         }
                     }
 
