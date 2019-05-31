@@ -41,6 +41,6 @@ interface MarkDao {
     fun getAllByService(): List<Mark>
 
     @Query("DELETE FROM mark")
-    fun nukeTable()
+    fun nukeTable() : Completable
 
 }

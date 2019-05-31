@@ -74,18 +74,21 @@ object WebParserUtils {
         } catch (e: IOException) {
             Log.d("runParserWeb", "", e)
             subscriber.onError(e)
+            return
         }
 
         if(doc == null) {
 
             val error = Throwable("Read Web doc is null")
             subscriber.onError(error)
+            return
         }
 
         val uri = Uri.parse(url)
         val type = WebType.domainOfEnum(uri.host) ?: run {
             val error = Throwable("Web Type error")
             subscriber.onError(error)
+            return
         }
 
         var list: ArrayList<Episode>? = null
@@ -133,6 +136,7 @@ object WebParserUtils {
         val type = WebType.domainOfEnum(uri.host) ?: run {
             val error = Throwable("Web Type error")
             subscriber.onError(error)
+            return
         }
 
         var list: ArrayList<String>? = null
@@ -141,12 +145,12 @@ object WebParserUtils {
             WebType.gufengmh8 -> run {
                 val parser = Gufengmh8WebParser()
                 list = ArrayList()
-                parser.parseEpisodeImages(url, list!!)
+                parser.parseEpisodeImages(url, list!!, subscriber)
             }
         }
 
         if(list != null) {
-            subscriber.onNext(list!!)
+//            subscriber.onNext(list!!)
             subscriber.onComplete()
         } else {
             val error = Throwable("parseEpisode list is null")

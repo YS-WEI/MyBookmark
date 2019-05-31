@@ -6,21 +6,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 
 class EpisodeViewModel : ViewModel() {
+    private var compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private var imagesLiveData: MutableLiveData<ArrayList<String>> = MutableLiveData()
 
-    private var imagesLiveData: MutableLiveData<List<String>> = MutableLiveData()
-
-
-    fun getImagesLiveData(): LiveData<List<String>> {
+    fun getImagesLiveData(): LiveData<ArrayList<String>> {
         return imagesLiveData
     }
 
     fun parseAllImage(url:String) {
 
-        WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
+       var disposable = WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                     list ->
@@ -30,7 +31,12 @@ class EpisodeViewModel : ViewModel() {
 
             },
                 { error -> Log.e("parser", "parser fail", error) })
+
+        compositeDisposable.add(disposable)
     }
 
-
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.clear()
+    }
 }

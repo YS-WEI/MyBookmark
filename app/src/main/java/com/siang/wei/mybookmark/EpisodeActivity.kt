@@ -3,18 +3,22 @@ package com.siang.wei.mybookmark
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
+import android.view.MenuItem
 
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import com.siang.wei.mybookmark.adapter.ImageRecyclerViewAdapter
 import com.siang.wei.mybookmark.databinding.ActivityEpisodeBinding
-import com.siang.wei.mybookmark.databinding.ActivityMainBinding
-import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.view_model.EpisodeViewModel
 
 import com.siang.wei.mybookmark.view_model.ViewModelFactory
-import com.siang.wei.mybookmark.view_model.WebViewModel
 
 
 class EpisodeActivity : AppCompatActivity() {
@@ -23,10 +27,11 @@ class EpisodeActivity : AppCompatActivity() {
     private lateinit var mViewModelFactory: ViewModelFactory
     private lateinit var mEpisodeViewModel: EpisodeViewModel
 
-    private var mImageList: List<String>? = null
+    private lateinit var mAdapter: ImageRecyclerViewAdapter
     private lateinit var mUrl : String
     private lateinit var mTitle : String
 
+    private lateinit var mImageList : ArrayList<String>
     companion object {
         const val URL_KEY = "url_key"
         const val TITLE_KEY = "title_key"
@@ -60,7 +65,16 @@ class EpisodeActivity : AppCompatActivity() {
         }
         setTitle(mTitle)
 
+        mImageList = ArrayList()
+        mAdapter = ImageRecyclerViewAdapter(mImageList)
+        val recyclerView = mBinding.recyclerView
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.orientation = VERTICAL
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = mAdapter
         setViewModel()
+
+
 
     }
 
@@ -71,12 +85,31 @@ class EpisodeActivity : AppCompatActivity() {
 
 //        mEpisodeViewModel.getImagesLiveData().observe(this, )
 
+        if(!TextUtils.isEmpty(mUrl)) {
+            mEpisodeViewModel.parseAllImage(mUrl)
+        }
 
+        mEpisodeViewModel.getImagesLiveData().observe(this, Observer<ArrayList<String>> {
+            list ->
+
+            Log.d("EpisodeActivity", "update list: ${mImageList}")
+            mAdapter.setList(list)
+
+
+
+        })
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item!!.itemId) {
+            android.R.id.home -> finish()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
 }

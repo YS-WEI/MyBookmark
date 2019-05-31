@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
 //        mGoogleDriveService = GoogleDriveService()
 //        mGoogleDriveService.loginGoogle(this)
 
-        val intent = Intent(this, ParseService::class.java)
-        startService(intent)
+//        val intent = Intent(this, ParseService::class.java)
+//        startService(intent)
 
     }
 

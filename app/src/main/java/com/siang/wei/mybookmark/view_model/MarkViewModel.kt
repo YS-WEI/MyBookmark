@@ -108,15 +108,27 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
 //        val backupData = BackupDatabase(DatabaseKeys.Version, marksLiveData.value!!)
         progressDialogLiveData.value = true
         var backupDatabase = BackupUtil.importBackuoData()
-        if(backupDatabase != null) {
-            val marks = backupDatabase.list.toTypedArray()
-            repository.markDao.insert(*marks).subscribeOn(Schedulers.io())
+        if(backupDatabase != null && backupDatabase.list.size > 0) {
+            repository.delectAll().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ progressDialogLiveData.value = false },
+                .subscribe({
+                    val marks = backupDatabase.list.toTypedArray()
+                    repository.markDao.insert(*marks).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            progressDialogLiveData.value = false
+                        },
+                            { error ->
+                                Log.e("refresh Data", "fail", error)
+                                progressDialogLiveData.value = false
+                            })
+                },
                     { error ->
-                        Log.e("refresh Data", "Unable to insert", error)
+                        Log.e("delete all mark", "fail", error)
                         progressDialogLiveData.value = false
                     })
+
+
         } else {
             progressDialogLiveData.value = false
         }

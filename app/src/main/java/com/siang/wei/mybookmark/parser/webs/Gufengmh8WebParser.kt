@@ -9,6 +9,7 @@ import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import com.siang.wei.mybookmark.util.ShareFun
+import io.reactivex.ObservableEmitter
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -117,27 +118,29 @@ class Gufengmh8WebParser: WebParser(){
     }
 
 
-    fun parseEpisodeImages(url: String, imageList : ArrayList<String> ) {
+    fun parseEpisodeImages(url: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
 
-
+        Log.d("parseEpisodeImages", url)
         var doc: Document? = null
 
         try {
             doc = Jsoup.connect(url).get()
 
         } catch (e: IOException) {
-            Log.d("runParserWeb", "", e)
+            Log.d("parseEpisodeImages", "", e)
+            return
         }
 
         if(doc != null) {
            val episodeImageData = getImageAndNextUrl(doc)
             if(!TextUtils.isEmpty(episodeImageData.imageUrl)) {
                 imageList.add(episodeImageData.imageUrl!!)
+                subscriber.onNext(imageList)
             }
 
             if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
                 val nextUrl = ShareFun.mergeUrl(url, episodeImageData.nextUrl!!)
-                parseEpisodeImages(nextUrl, imageList)
+                parseEpisodeImages(nextUrl, imageList, subscriber)
             }
 
         }

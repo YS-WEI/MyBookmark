@@ -35,7 +35,7 @@ class MarkDatebaseRepository constructor(markDao: MarkDao){
         return markDao.update(mark)
     }
 
-    fun delectAll() {
+    fun delectAll() : Completable{
         return markDao.nukeTable()
     }
 
