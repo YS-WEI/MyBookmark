@@ -24,6 +24,8 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
 
     private var episodesData : MutableLiveData<ArrayList<Episode>> = MutableLiveData()
 
+    private var progressDialogLiveData: MutableLiveData<Boolean> = MutableLiveData()
+
     fun setMark(mark: Mark) {
         markData.value = mark
         parserWebEpisode()
@@ -35,6 +37,10 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
 
     fun getEpisodesData(): LiveData<ArrayList<Episode>> {
         return episodesData
+    }
+
+    fun getProgressDialogLiveData(): LiveData<Boolean> {
+        return progressDialogLiveData
     }
 
     override fun onCleared() {
@@ -51,13 +57,15 @@ class WebViewModel constructor(repository: MarkDatebaseRepository) : ViewModel()
         val mark = markData.value
         if(mark != null) {
             val url = mark.url
-
+            progressDialogLiveData.value = true
             WebParserUtils.startParseEpisode(url).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({list ->
                     episodesData.value = list
+                    progressDialogLiveData.value = false
                 }, {
                         error -> Log.e("Parser Episode", "", error)
+                        progressDialogLiveData.value = false
                 })
         }
     }

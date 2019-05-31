@@ -19,12 +19,14 @@ import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
+import com.siang.wei.mybookmark.util.AlertUtil
 import com.siang.wei.mybookmark.view_model.ViewModelFactory
 import com.siang.wei.mybookmark.view_model.WebViewModel
 
@@ -52,6 +54,8 @@ class WebActivity : AppCompatActivity() {
 
     private lateinit var mViewModelFactory: ViewModelFactory
     private lateinit var mWebViewModel: WebViewModel
+
+    private var mProgressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,6 +121,17 @@ class WebActivity : AppCompatActivity() {
                   showToast("Episode number: ${list.size}")
                 }
             })
+
+        mWebViewModel.getProgressDialogLiveData().observe(this, Observer<Boolean>{ isShow ->
+            if(mProgressDialog == null) {
+                mProgressDialog = AlertUtil.showProgressBar(this)
+            }
+
+            if(isShow)
+                mProgressDialog!!.show()
+            else
+                mProgressDialog!!.dismiss()
+        })
     }
 
     private fun initRefresh() {
