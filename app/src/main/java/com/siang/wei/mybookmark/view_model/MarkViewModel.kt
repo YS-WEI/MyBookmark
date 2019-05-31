@@ -75,7 +75,6 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
     }
 
     fun delMark(mark: Mark) {
-        repository
         compositeDisposable.add(repository.delect(mark)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -102,6 +101,25 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
         }
 
 
+    }
+
+    fun actionRefreshData() {
+
+//        val backupData = BackupDatabase(DatabaseKeys.Version, marksLiveData.value!!)
+        progressDialogLiveData.value = true
+        var backupDatabase = BackupUtil.importBackuoData()
+        if(backupDatabase != null) {
+            val marks = backupDatabase.list.toTypedArray()
+            repository.markDao.insert(*marks).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ progressDialogLiveData.value = false },
+                    { error ->
+                        Log.e("refresh Data", "Unable to insert", error)
+                        progressDialogLiveData.value = false
+                    })
+        } else {
+            progressDialogLiveData.value = false
+        }
     }
 
     override fun onCleared() {

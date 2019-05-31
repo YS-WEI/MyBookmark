@@ -24,11 +24,11 @@ interface MarkDao {
     fun check(url: String): Single<List<Mark>>
 
     @Insert
-    fun insert(vararg users: Mark): Completable
+    fun insert(vararg marks: Mark): Completable
 
 
     @Delete
-    fun delete(user: Mark): Completable
+    fun delete(mark: Mark): Completable
 
     @Update
     fun update(vararg marks: Mark): Completable
@@ -39,4 +39,8 @@ interface MarkDao {
 
     @Query("SELECT * FROM mark")
     fun getAllByService(): List<Mark>
+
+    @Query("DELETE FROM mark")
+    fun nukeTable()
+
 }

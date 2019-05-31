@@ -11,6 +11,8 @@ class ViewModelFactory constructor(private val repository: MarkDatebaseRepositor
             return MarkViewModel(repository) as T
         } else if (modelClass.isAssignableFrom(WebViewModel::class.java)) {
             return WebViewModel(repository) as T
+        } else if (modelClass.isAssignableFrom(EpisodeViewModel::class.java)) {
+            return EpisodeViewModel() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

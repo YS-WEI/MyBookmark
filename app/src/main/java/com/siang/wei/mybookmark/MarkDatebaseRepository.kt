@@ -1,5 +1,6 @@
 package com.siang.wei.mybookmark
 
+import com.siang.wei.mybookmark.db.AppDatabase
 import com.siang.wei.mybookmark.db.MarkDao
 import com.siang.wei.mybookmark.db.model.Mark
 import io.reactivex.Completable
@@ -18,6 +19,10 @@ class MarkDatebaseRepository constructor(markDao: MarkDao){
         return markDao.insert(mark)
     }
 
+//    fun insert(marks: List<Mark>): Completable {
+//        return markDao.insert(marks)
+//    }
+
     fun delect(mark: Mark) : Completable {
         return markDao.delete(mark)
     }
@@ -29,4 +34,9 @@ class MarkDatebaseRepository constructor(markDao: MarkDao){
     fun updateByNoWait(mark: Mark):Completable {
         return markDao.update(mark)
     }
+
+    fun delectAll() {
+        return markDao.nukeTable()
+    }
+
 }

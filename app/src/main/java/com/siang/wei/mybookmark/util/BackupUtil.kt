@@ -3,10 +3,13 @@ package com.siang.wei.mybookmark.util
 import android.os.Environment
 import android.util.Log
 import com.google.gson.Gson
+import com.siang.wei.mybookmark.db.MarkDao
 import com.siang.wei.mybookmark.db.model.BackupDatabase
 import com.siang.wei.mybookmark.parser.WebParserUtils
+import io.reactivex.Completable
 import io.reactivex.Observable
 import java.io.File
+import java.io.FileReader
 import java.io.IOException
 
 object BackupUtil {
@@ -20,7 +23,7 @@ object BackupUtil {
             var gson = Gson()
 
             var jsonString = gson.toJson(backupDatabase)
-            var fileName = "database_auto.json"
+            var fileName = "database_auto_${ShareFun.getDateTime()}.json"
             if(isManual!!) {
                 fileName = "database_${ShareFun.getDateTime()}.json"
             }
@@ -36,5 +39,19 @@ object BackupUtil {
         }
 
 
+    }
+
+    fun importBackuoData(): BackupDatabase? {
+        val filePath = SharedFileMethod.combinePath(BACKUP_DIR, "database_auto.json")
+        val file = File(filePath)
+        if(!file.exists()) {
+            return null
+        }
+
+        var gson = Gson()
+
+        val backupDatabase = gson.fromJson(FileReader(filePath), BackupDatabase::class.java)
+        Log.d("importBackuoData", backupDatabase.toString())
+        return backupDatabase
     }
 }

@@ -6,7 +6,10 @@ import android.os.Bundle
 
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
+import com.siang.wei.mybookmark.databinding.ActivityEpisodeBinding
+import com.siang.wei.mybookmark.databinding.ActivityMainBinding
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.view_model.EpisodeViewModel
 
@@ -15,7 +18,7 @@ import com.siang.wei.mybookmark.view_model.WebViewModel
 
 
 class EpisodeActivity : AppCompatActivity() {
-
+    private lateinit var mBinding: ActivityEpisodeBinding
 
     private lateinit var mViewModelFactory: ViewModelFactory
     private lateinit var mEpisodeViewModel: EpisodeViewModel
@@ -41,6 +44,8 @@ class EpisodeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_episode)
 
         if(intent.hasExtra(URL_KEY)) {
             mUrl = intent.getStringExtra(URL_KEY)
@@ -69,6 +74,9 @@ class EpisodeActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
 
 
 }

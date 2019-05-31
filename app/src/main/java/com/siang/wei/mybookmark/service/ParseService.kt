@@ -33,8 +33,9 @@ class ParseService: IntentService(SERVICE_NAME) {
 
             markDao.updateByService(mark)
         } }
-
-        endSaveBackup(markDao)
+        if(marks.size > 0) {
+            endSaveBackup(markDao)
+        }
     }
 
     fun endSaveBackup (markDao: MarkDao ) {

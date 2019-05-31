@@ -87,6 +87,10 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        R.id.action_refresh -> {
+            markViewModel.actionRefreshData()
+            true
+        }
         else -> {
             super.onOptionsItemSelected(item)
         }
