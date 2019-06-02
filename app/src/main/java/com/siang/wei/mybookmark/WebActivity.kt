@@ -261,6 +261,16 @@ class WebActivity : AppCompatActivity() {
                 }
 
             }
+            WebType.mhkan -> {
+                if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
+                    val episode: Episode? = mWebViewModel.nextUrl(url)
+                    if(episode != null) {
+                        EpisodeActivity.open(this, url, episode.title!!)
+                        return true
+                    }
+                }
+
+            }
             else -> {
                 if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
                     mWebViewModel.nextUrl(url)

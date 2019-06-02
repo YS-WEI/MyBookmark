@@ -14,13 +14,18 @@ import io.reactivex.schedulers.Schedulers
 class EpisodeViewModel : ViewModel() {
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var imagesLiveData: MutableLiveData<ArrayList<String>> = MutableLiveData()
+    private var progressDialogLiveData: MutableLiveData<Boolean> = MutableLiveData()
+
+    fun getProgressDialogLiveData(): LiveData<Boolean> {
+        return progressDialogLiveData
+    }
 
     fun getImagesLiveData(): LiveData<ArrayList<String>> {
         return imagesLiveData
     }
 
     fun parseAllImage(url:String) {
-
+        progressDialogLiveData.value = true
        var disposable = WebParserUtils.startParseImage(url).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -28,9 +33,10 @@ class EpisodeViewModel : ViewModel() {
                 Log.d("startParseImage", "${list}")
 
                 imagesLiveData.value = list
-
+                progressDialogLiveData.value = false
             },
-                { error -> Log.e("parser", "parser fail", error) })
+                { error -> Log.e("parser", "parser fail", error)
+                    progressDialogLiveData.value = false})
 
         compositeDisposable.add(disposable)
     }

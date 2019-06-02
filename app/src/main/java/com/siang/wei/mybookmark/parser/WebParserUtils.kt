@@ -6,10 +6,7 @@ import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
-import com.siang.wei.mybookmark.parser.webs.Gufengmh8WebParser
-import com.siang.wei.mybookmark.parser.webs.ManhuaguiWebParser
-import com.siang.wei.mybookmark.parser.webs.SoudongmanWebParser
-import com.siang.wei.mybookmark.parser.webs.TohomhWebParser
+import com.siang.wei.mybookmark.parser.webs.*
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import org.jsoup.Jsoup
@@ -47,6 +44,10 @@ object WebParserUtils {
             }
             WebType.gufengmh8 ->  run {
                 val parser = Gufengmh8WebParser()
+                return parser.information(doc, mark)
+            }
+            WebType.mhkan ->  run {
+                val parser = MhkanWebParser()
                 return parser.information(doc, mark)
             }
             WebType.manhuagui ->  run {
@@ -105,6 +106,10 @@ object WebParserUtils {
                 val parser = Gufengmh8WebParser()
                 list = parser.episode(doc!!)
             }
+            WebType.mhkan -> run {
+                val parser = MhkanWebParser()
+                list = parser.episode(doc!!)
+            }
             WebType.manhuagui -> run {
                 val parser = ManhuaguiWebParser()
                 list = parser.episode(doc!!)
@@ -147,10 +152,15 @@ object WebParserUtils {
                 list = ArrayList()
                 parser.parseEpisodeImages(url, list!!, subscriber)
             }
+            WebType.mhkan -> run {
+                val parser = MhkanWebParser()
+                list = ArrayList()
+                parser.parseEpisodeImages(url, list!!, subscriber)
+            }
         }
 
         if(list != null) {
-//            subscriber.onNext(list!!)
+            subscriber.onNext(list!!)
             subscriber.onComplete()
         } else {
             val error = Throwable("parseEpisode list is null")

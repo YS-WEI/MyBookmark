@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
 //        mGoogleDriveService = GoogleDriveService()
 //        mGoogleDriveService.loginGoogle(this)
 
-//        val intent = Intent(this, ParseService::class.java)
-//        startService(intent)
+        val intent = Intent(this, ParseService::class.java)
+        startService(intent)
 
     }
 
@@ -83,12 +83,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         R.id.action_backup -> {
-            backupData()
+            activeData(item.itemId)
             true
         }
 
         R.id.action_refresh -> {
-            markViewModel.actionRefreshData()
+            activeData(item.itemId)
             true
         }
         else -> {
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-    fun backupData() {
+    fun activeData(active: Int) {
         val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
         if (!PermissionUtil.needGrantRuntimePermission(
                 this,
@@ -214,7 +214,17 @@ class MainActivity : AppCompatActivity() {
                 PermissionUtil.PERMISSION_REQUEST_CODE_EXTERNAL_STORAGE
             )
         ) {
-            markViewModel.actionBackup()
+            when(active) {
+                R.id.action_backup -> {
+                    markViewModel.actionBackup()
+                }
+
+                R.id.action_refresh -> {
+                    markViewModel.actionRefreshData()
+                }
+            }
+
+
         }
     }
 
@@ -224,14 +234,11 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == PermissionUtil.PERMISSION_REQUEST_CODE_INIT) {
             Log.d("CheckPath", "Permissions Result!")
             if (PermissionUtil.verifyPermissions(grantResults)) {
-                backupData()
             } else {
                 AlertUtil.showAlertDialog(
-                    this, "請同意啟用權限", android.R.string.ok, android.R.string.cancel,
-                    DialogInterface.OnClickListener { dialogInterface, i -> backupData() },
+                    this, "請同意啟用權限", android.R.string.ok,
                     DialogInterface.OnClickListener { dialogInterface, i ->
                         dialogInterface.cancel()
-                        System.exit(10)
                     },
                     false
                 )

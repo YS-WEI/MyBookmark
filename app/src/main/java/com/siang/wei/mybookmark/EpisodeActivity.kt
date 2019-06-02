@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 
 
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.siang.wei.mybookmark.adapter.ImageRecyclerViewAdapter
 import com.siang.wei.mybookmark.databinding.ActivityEpisodeBinding
+import com.siang.wei.mybookmark.util.AlertUtil
 import com.siang.wei.mybookmark.view_model.EpisodeViewModel
 
 import com.siang.wei.mybookmark.view_model.ViewModelFactory
@@ -32,6 +34,8 @@ class EpisodeActivity : AppCompatActivity() {
     private lateinit var mTitle : String
 
     private lateinit var mImageList : ArrayList<String>
+
+    private var mProgressDialog: AlertDialog? = null
     companion object {
         const val URL_KEY = "url_key"
         const val TITLE_KEY = "title_key"
@@ -97,6 +101,17 @@ class EpisodeActivity : AppCompatActivity() {
 
 
 
+        })
+
+        mEpisodeViewModel.getProgressDialogLiveData().observe(this, Observer<Boolean>{ isShow ->
+            if(mProgressDialog == null) {
+                mProgressDialog = AlertUtil.showProgressBar(this)
+            }
+
+            if(isShow)
+                mProgressDialog!!.show()
+            else
+                mProgressDialog!!.dismiss()
         })
     }
 

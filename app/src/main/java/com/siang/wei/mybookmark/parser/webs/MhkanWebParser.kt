@@ -16,7 +16,7 @@ import org.jsoup.nodes.Element
 import java.io.IOException
 import java.lang.Exception
 
-class Gufengmh8WebParser: WebParser(){
+class MhkanWebParser: WebParser(){
 
     override fun information(doc: Document, mark: Mark): Mark? {
 
@@ -72,7 +72,7 @@ class Gufengmh8WebParser: WebParser(){
             mark.name = title
         }
 
-        mark.type = WebType.gufengmh8.domain
+        mark.type = WebType.mhkan.domain
 
         return mark
     }
@@ -153,37 +153,55 @@ class Gufengmh8WebParser: WebParser(){
         var imageUrl = ""
         var nextUrl = ""
 
-        val contentElements = doc.getElementsByClass("chapter-content")
-        if(contentElements != null) {
+        val actionElement = doc.getElementById("action")
+        if(actionElement != null) {
+            val linkElements = actionElement.select("mip-link");
 
-            contentElements.forEach { contentElement ->
-                val linkElements = contentElement.select("a");
-
-                linkElements.forEach { linkElement ->
-                    val text = linkElement.text()
-                    if(!TextUtils.isEmpty(text)) {
-                        if(text.equals("下一页", true)) {
-
-                            nextUrl = linkElement.attr("href")
-                            try {
-                                var uri = Uri.parse(nextUrl);
-                                if(uri.path == null) {
-                                    nextUrl = ""
-                                }
-                            } catch (e: Exception) {
+            linkElements.forEach { linkElement ->
+                val text = linkElement.text()
+                if(!TextUtils.isEmpty(text)) {
+                    if(text.equals("下一页", true)) {
+                        nextUrl = linkElement.attr("href")
+                        try {
+                            var uri = Uri.parse(nextUrl);
+                            if(uri.path == null) {
                                 nextUrl = ""
+                            }
+                        } catch (e: Exception) {
+                            nextUrl = ""
+                        }
+                    }
+                }
+            }
+        }
+
+        if(!TextUtils.isEmpty(nextUrl)) {
+            val mipLinkElements = doc.select("mip-link")
+
+            if (mipLinkElements != null) {
+                run parsebreaking@ {
+                    mipLinkElements.forEach { mipLinkElement ->
+                        var href = mipLinkElement.attr("href")
+                        if (nextUrl.equals(href, true)) {
+                            val imageElements = mipLinkElement.select("mip-img")
+                            run imagebreaking@ {
+                                imageElements.forEach { imageElement ->
+                                    val src = imageElement.attr("src")
+                                    if (!TextUtils.isEmpty(src)) {
+                                        imageUrl = src
+                                        return@imagebreaking
+                                    }
+                                }
+                            }
+
+                            if(!TextUtils.isEmpty(imageUrl)) {
+                                return@parsebreaking
                             }
                         }
                     }
-
-                    val imageElements = linkElement.select("img")
-
-                    if(imageElements != null && imageElements.size == 1) {
-                        imageUrl = imageElements.attr("src")
-                    }
-
                 }
             }
+
         }
 
         return EpisodeImageData(imageUrl, nextUrl)

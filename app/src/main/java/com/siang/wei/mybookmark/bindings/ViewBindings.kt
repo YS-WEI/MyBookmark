@@ -19,10 +19,16 @@ object ViewBindings {
             return
         }
 
-        val context = imageView.context
-        Glide.with(context)
-            .load(url)
-            .into(imageView)
+        if(url.equals("error_image", true)) {
+            imageView.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+        } else if (url.equals("end_image", true)) {
+            imageView.setImageResource(android.R.drawable.button_onoff_indicator_on)
+        } else {
+            val context = imageView.context
+            Glide.with(context)
+                .load(url)
+                .into(imageView)
+        }
     }
 
     @BindingAdapter(value = ["lastTimeDate", "updateDate"])

@@ -105,7 +105,7 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
 
     fun actionRefreshData() {
 
-//        val backupData = BackupDatabase(DatabaseKeys.Version, marksLiveData.value!!)
+//        val activeData = BackupDatabase(DatabaseKeys.Version, marksLiveData.value!!)
         progressDialogLiveData.value = true
         var backupDatabase = BackupUtil.importBackuoData()
         if(backupDatabase != null && backupDatabase.list.size > 0) {

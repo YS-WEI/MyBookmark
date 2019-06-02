@@ -42,7 +42,7 @@ object BackupUtil {
     }
 
     fun importBackuoData(): BackupDatabase? {
-        val filePath = SharedFileMethod.combinePath(BACKUP_DIR, "database_auto.json")
+        val filePath = SharedFileMethod.combinePath(BACKUP_DIR, "reload.json")
         val file = File(filePath)
         if(!file.exists()) {
             return null

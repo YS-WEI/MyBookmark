@@ -4,6 +4,7 @@ enum class WebType {
     soudongman("m.soudongman.com", "搜动漫"),
     tohomh123("m.tohomh123.com", "土豪"),
     gufengmh8("m.gufengmh8.com", "古风"),
+    mhkan("m.mhkan.com", "漫画看"),
     manhuagui("m.manhuagui.com", "看漫画");
 
 
