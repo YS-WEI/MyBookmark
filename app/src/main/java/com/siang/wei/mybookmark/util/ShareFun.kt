@@ -71,7 +71,7 @@ object ShareFun {
         var newUrl = url
 
         if(TextUtils.isEmpty(addUri.host) || uri.host.equals(addUri.host, true)) {
-            var pathSegments = uri.pathSegments as ArrayList<String>
+           // var pathSegments = uri.pathSegments as ArrayList<String>
 
             addUri.pathSegments.forEach {addSeg ->
                 val match = uri.pathSegments.find { seg ->

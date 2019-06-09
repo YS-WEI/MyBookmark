@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(this, ParseService::class.java)
         startService(intent)
+
     }
 
     private fun registerReceiver()
