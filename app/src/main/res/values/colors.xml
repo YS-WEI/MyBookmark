@@ -15,4 +15,11 @@
     <color name="colorTabTextUnSelect">@color/colorTextSub</color>
     <color name="colorTabTextSelected">@color/colorTextPrimary</color>
     <color name="transparent_dark">#77000000</color>
+
+
+    <color name="web_type_soudongman">#CD1155EE</color>
+    <color name="web_type_tohomh123">#CDCC1155</color>
+    <color name="web_type_gufengmh8">#CDAA8855</color>
+    <color name="web_type_mhkan">#CDAA8855</color>
+    <color name="web_type_manhuagui">#CD44CC55</color>
 </resources>

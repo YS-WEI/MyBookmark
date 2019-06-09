@@ -8,6 +8,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.siang.wei.mybookmark.R
 import com.siang.wei.mybookmark.db.model.Mark
+import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.util.ShareFun
 
 object ViewBindings {
@@ -51,6 +52,28 @@ object ViewBindings {
 
             view.visibility = View.GONE
         }
+
+    }
+
+    @BindingAdapter("setWebType")
+    @JvmStatic
+    fun setWebType(textView: TextView, type: String?) {
+        if(TextUtils.isEmpty(type)) {
+            textView.visibility = View.GONE
+        } else {
+
+            val webType = WebType.domainOfEnum(type!!)
+            if(webType != null) {
+                textView.text = webType.webName
+
+                textView.setBackgroundResource(webType.color);
+            } else {
+                textView.visibility = View.GONE
+            }
+
+
+        }
+
 
     }
 }

@@ -1,8 +1,7 @@
 package com.siang.wei.mybookmark
 
 import android.Manifest
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -65,10 +64,49 @@ class MainActivity : AppCompatActivity() {
         setViewModel()
 //        mGoogleDriveService = GoogleDriveService()
 //        mGoogleDriveService.loginGoogle(this)
+        registerReceiver();
 
         val intent = Intent(this, ParseService::class.java)
         startService(intent)
+    }
 
+    private fun registerReceiver()
+    {
+        val filter = IntentFilter()
+        filter.addAction(ParseService.ACTION_RETURN_FINISH);
+        filter.addAction(ParseService.ACTION_RETURN_UPDATE);
+        registerReceiver(syncServiceState, filter);
+    }
+
+    private val syncServiceState = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+
+            var totle = 0
+            var current = 0
+            if(intent.hasExtra(ParseService.EXTRA_CURRENT_NUMBER)) {
+                current = intent.getIntExtra(ParseService.EXTRA_CURRENT_NUMBER, 0)
+            }
+
+            if(intent.hasExtra(ParseService.EXTRA_TOTLE_SIZE)) {
+                totle = intent.getIntExtra(ParseService.EXTRA_TOTLE_SIZE, 0)
+            }
+
+
+            if (action == ParseService.ACTION_RETURN_FINISH) {
+                mBinding.textMessage.text = "更新資料完成!... $current / $totle"
+
+                mBinding.syncView.visibility = View.GONE
+
+            } else if (action == ParseService.ACTION_RETURN_UPDATE) {
+                mBinding.textMessage.text = "更新資料中... $current / $totle"
+
+                if(mBinding.syncView.visibility == View.GONE) {
+                    mBinding.syncView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
