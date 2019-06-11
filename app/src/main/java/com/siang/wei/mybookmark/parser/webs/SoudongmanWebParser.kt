@@ -50,7 +50,7 @@ class SoudongmanWebParser: WebParser(){
         if(updatTimeElement != null) {
             val datetime = updatTimeElement.attr("datetime")
             val totalEpisode = updatTimeElement.attr("data-lc_name")
-            val updateDate= ShareFun.converDate(datetime.toLong())
+            val updateDate= ShareFun.convertDataBaseDateFormat(datetime.toLong())
             if(!TextUtils.isEmpty(updateDate)) {
                 mark.updateDate = updateDate
             }

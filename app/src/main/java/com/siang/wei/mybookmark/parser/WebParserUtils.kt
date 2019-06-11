@@ -54,6 +54,10 @@ object WebParserUtils {
                 val parser = ManhuaguiWebParser()
                 return parser.information(doc, mark)
             }
+            WebType.duzhez ->  run {
+                val parser = DuzhezWebParser()
+                return parser.information(doc, mark)
+            }
 
             else -> return mark
         }
@@ -114,6 +118,10 @@ object WebParserUtils {
                 val parser = ManhuaguiWebParser()
                 list = parser.episode(doc!!)
             }
+            WebType.duzhez -> run {
+                val parser = DuzhezWebParser()
+                list = parser.episode(doc!!)
+            }
 
             else -> list = null
         }
@@ -154,6 +162,11 @@ object WebParserUtils {
             }
             WebType.mhkan -> run {
                 val parser = MhkanWebParser()
+                list = ArrayList()
+                parser.parseEpisodeImages(url, list!!, subscriber)
+            }
+            WebType.duzhez -> run {
+                val parser = DuzhezWebParser()
                 list = ArrayList()
                 parser.parseEpisodeImages(url, list!!, subscriber)
             }

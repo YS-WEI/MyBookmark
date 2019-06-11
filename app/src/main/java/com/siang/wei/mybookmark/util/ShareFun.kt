@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import java.lang.Exception
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -57,7 +58,22 @@ object ShareFun {
         return formatter.format(parser.parse(date))
     }
 
-    fun converDate(date : Long): String {
+
+    fun convertToDate(dateString : String, format: String): Date? {
+        if(TextUtils.isEmpty(dateString)) {
+            return null
+        }
+
+        val parser = SimpleDateFormat(format)
+        try {
+            val date = parser.parse(dateString)
+            return date
+        } catch (ex: Exception) {
+            return null
+        }
+    }
+
+    fun convertDataBaseDateFormat(date : Long): String {
         var dateTime = Date(date)
         val formatter = SimpleDateFormat(dateFormat)
         return formatter.format(date)

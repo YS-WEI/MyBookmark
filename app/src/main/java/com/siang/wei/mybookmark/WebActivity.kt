@@ -2,7 +2,6 @@ package com.siang.wei.mybookmark
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.webkit.WebView
 import android.os.Build
 import android.annotation.TargetApi
 import android.content.Context
@@ -13,9 +12,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -94,7 +91,9 @@ class WebActivity : AppCompatActivity() {
         //自动加载图片
         webSettings.loadsImagesAutomatically = true;
 
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        }
 
         removeJavascriptInterfaces(mWebView)
         mWebView.webViewClient = mWebClient
@@ -252,24 +251,13 @@ class WebActivity : AppCompatActivity() {
         val type = getWebType(url)
         when(type) {
             WebType.gufengmh8 -> {
-                if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
-                    val episode: Episode? = mWebViewModel.nextUrl(url)
-                    if(episode != null) {
-                        EpisodeActivity.open(this, url, episode.title!!)
-                        return true
-                    }
-                }
-
+                return openShowActivity(url)
             }
             WebType.mhkan -> {
-                if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
-                    val episode: Episode? = mWebViewModel.nextUrl(url)
-                    if(episode != null) {
-                        EpisodeActivity.open(this, url, episode.title!!)
-                        return true
-                    }
-                }
-
+                return openShowActivity(url)
+            }
+            WebType.duzhez -> {
+                return openShowActivity(url)
             }
             else -> {
                 if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
@@ -278,6 +266,17 @@ class WebActivity : AppCompatActivity() {
             }
         }
 
+        return false
+    }
+
+    private fun openShowActivity(url: String): Boolean {
+        if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
+            val episode: Episode? = mWebViewModel.nextUrl(url)
+            if(episode != null) {
+                EpisodeActivity.open(this, url, episode.title!!)
+                return true
+            }
+        }
         return false
     }
 
