@@ -1,6 +1,5 @@
 package com.siang.wei.mybookmark.parser.webs
 
-import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
@@ -13,7 +12,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
-import java.lang.Exception
 import java.util.*
 
 class DuzhezWebParser: WebParser(){
@@ -148,39 +146,15 @@ class DuzhezWebParser: WebParser(){
         var imageUrl = ""
         var nextUrl = ""
 
-        val contentElements = doc.getElementsByClass("chapter-content")
-        if(contentElements != null) {
+        val imageElement = doc.getElementById("images")
+        if(imageElement != null) {
 
-            contentElements.forEach { contentElement ->
-                val linkElements = contentElement.select("a");
+            val imageElements = imageElement.select("img")
 
-                linkElements.forEach { linkElement ->
-                    val text = linkElement.text()
-                    if(!TextUtils.isEmpty(text)) {
-                        if(text.equals("下一页", true)) {
-
-                            nextUrl = linkElement.attr("href")
-                            try {
-                                var uri = Uri.parse(nextUrl);
-                                if(uri.path == null) {
-                                    nextUrl = ""
-                                }
-                            } catch (e: Exception) {
-                                nextUrl = ""
-                            }
-                        }
-                    }
-
-                    val imageElements = linkElement.select("img")
-
-                    if(imageElements != null && imageElements.size == 1) {
-                        imageUrl = imageElements.attr("src")
-                    }
-
-                }
+            if (imageElements != null && imageElements.size == 1) {
+                imageUrl = imageElements.attr("src")
             }
         }
-
         return EpisodeImageData(imageUrl, nextUrl)
     }
 

@@ -59,6 +59,11 @@ object WebParserUtils {
                 return parser.information(doc, mark)
             }
 
+            WebType.wuyouhui ->  run {
+                val parser = WuyoyhuiWebParser()
+                return parser.information(doc, mark)
+            }
+
             else -> return mark
         }
 
@@ -123,6 +128,10 @@ object WebParserUtils {
                 list = parser.episode(doc!!)
             }
 
+            WebType.wuyouhui ->  run {
+                val parser = WuyoyhuiWebParser()
+                list = parser.episode(doc)
+            }
             else -> list = null
         }
 
@@ -167,6 +176,12 @@ object WebParserUtils {
             }
             WebType.duzhez -> run {
                 val parser = DuzhezWebParser()
+                list = ArrayList()
+                parser.parseEpisodeImages(url, list!!, subscriber)
+            }
+
+            WebType.wuyouhui ->  run {
+                val parser = WuyoyhuiWebParser()
                 list = ArrayList()
                 parser.parseEpisodeImages(url, list!!, subscriber)
             }

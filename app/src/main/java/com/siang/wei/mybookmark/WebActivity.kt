@@ -256,9 +256,12 @@ class WebActivity : AppCompatActivity() {
             WebType.mhkan -> {
                 return openShowActivity(url)
             }
-            WebType.duzhez -> {
-                return openShowActivity(url)
-            }
+//            WebType.wuyouhui -> {
+//                return openShowActivity(url)
+//            }
+//            WebType.duzhez -> {
+//                return openShowActivity(url)
+//            }
             else -> {
                 if(!TextUtils.isEmpty(url) && !mInputMark.url.equals(url, true)) {
                     mWebViewModel.nextUrl(url)
