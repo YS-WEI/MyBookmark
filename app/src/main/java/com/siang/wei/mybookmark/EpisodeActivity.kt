@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.siang.wei.mybookmark.adapter.ImageRecyclerViewAdapter
 import com.siang.wei.mybookmark.databinding.ActivityEpisodeBinding
+import com.siang.wei.mybookmark.model.ParserProgress
 import com.siang.wei.mybookmark.util.AlertUtil
 import com.siang.wei.mybookmark.view_model.EpisodeViewModel
 
@@ -90,7 +91,7 @@ class EpisodeActivity : AppCompatActivity() {
 //        mEpisodeViewModel.getImagesLiveData().observe(this, )
 
         if(!TextUtils.isEmpty(mUrl)) {
-            mEpisodeViewModel.parseAllImage(mUrl)
+            mEpisodeViewModel.parseAllImage(mUrl, this)
         }
 
         mEpisodeViewModel.getImagesLiveData().observe(this, Observer<ArrayList<String>> {
@@ -112,6 +113,15 @@ class EpisodeActivity : AppCompatActivity() {
                 mProgressDialog!!.show()
             else
                 mProgressDialog!!.dismiss()
+        })
+
+        mEpisodeViewModel.getParserProgressLiveData().observe(this, Observer<ParserProgress> { progress ->
+
+            if(mProgressDialog != null && mProgressDialog!!.isShowing) {
+
+                mProgressDialog!!.setTitle("${progress.current}/${progress.total}")
+
+            }
         })
     }
 

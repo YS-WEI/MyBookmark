@@ -174,17 +174,13 @@ object WebParserUtils {
                 list = ArrayList()
                 parser.parseEpisodeImages(url, list!!, subscriber)
             }
-            WebType.duzhez -> run {
-                val parser = DuzhezWebParser()
-                list = ArrayList()
-                parser.parseEpisodeImages(url, list!!, subscriber)
-            }
-
-            WebType.wuyouhui ->  run {
-                val parser = WuyoyhuiWebParser()
-                list = ArrayList()
-                parser.parseEpisodeImages(url, list!!, subscriber)
-            }
+//            WebType.wuyouhui ->  run {
+//                val parser = WuyoyhuiWebParser()
+//                list = ArrayList()
+//                if(context != null) {
+//                    parser.parseEpisodeImages(context, url, list!!, subscriber)
+//                }
+//            }
         }
 
         if(list != null) {

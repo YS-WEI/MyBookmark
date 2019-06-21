@@ -22,13 +22,17 @@ object ViewBindings {
 
         if(url.equals("error_image", true)) {
             imageView.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            imageView.scaleType = ImageView.ScaleType.CENTER
         } else if (url.equals("end_image", true)) {
             imageView.setImageResource(android.R.drawable.button_onoff_indicator_on)
+            imageView.scaleType = ImageView.ScaleType.CENTER
         } else {
             val context = imageView.context
+            imageView.scaleType = ImageView.ScaleType.FIT_XY
             Glide.with(context)
                 .load(url)
                 .into(imageView)
+
         }
     }
 

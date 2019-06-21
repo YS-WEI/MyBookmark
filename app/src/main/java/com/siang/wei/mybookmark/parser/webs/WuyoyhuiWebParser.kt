@@ -1,20 +1,20 @@
 package com.siang.wei.mybookmark.parser.webs
 
+import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.EpisodeImageData
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.util.ShareFun
 import io.reactivex.ObservableEmitter
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import java.io.IOException
 import java.lang.Exception
 import java.util.*
+
+
 
 class WuyoyhuiWebParser: WebParser(){
 
@@ -155,36 +155,13 @@ class WuyoyhuiWebParser: WebParser(){
     }
 
 
-    fun parseEpisodeImages(url: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
+    fun parseEpisodeImages(context: Context, url: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
+//       val backgroundWeb = BackgroundWeb()
+//        backgroundWeb.run(context, url)
 
-        Log.d("parseEpisodeImages", url)
-        var doc: Document? = null
-
-        try {
-            doc = Jsoup.connect(url).get()
-
-        } catch (e: IOException) {
-            Log.d("parseEpisodeImages", "", e)
-            return
-        }
-
-        if(doc != null) {
-            val xx = doc.toString();
-           val episodeImageData = getImageAndNextUrl(doc)
-            if(!TextUtils.isEmpty(episodeImageData.imageUrl)) {
-                imageList.add(episodeImageData.imageUrl!!)
-            } else {
-                imageList.add("error_image")
-            }
-
-            if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
-                val nextUrl = ShareFun.mergeUrl(url, episodeImageData.nextUrl!!)
-                parseEpisodeImages(nextUrl, imageList, subscriber)
-            } else {
-                imageList.add("end_image")
-            }
-
-        }
+//        val intent = Intent(context, BackgroundWebService::class.java)
+//        intent.putExtra(BackgroundWebService.URL_KEY, url)
+//        context.startService(intent)
     }
 
     private fun getImageAndNextUrl(doc: Document): EpisodeImageData {

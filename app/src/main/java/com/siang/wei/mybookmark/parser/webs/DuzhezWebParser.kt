@@ -1,18 +1,22 @@
 package com.siang.wei.mybookmark.parser.webs
 
+import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
-import com.siang.wei.mybookmark.db.model.EpisodeImageData
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
+import com.siang.wei.mybookmark.parser.BackgroundWeb
+import com.siang.wei.mybookmark.parser.BackgroundWeb.*
 import com.siang.wei.mybookmark.util.ShareFun
+import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
-import java.util.*
+import kotlin.collections.ArrayList
+import com.siang.wei.mybookmark.parser.BackgroundWeb.DemoJavaScriptInterface as DemoJavaScriptInterface1
 
 class DuzhezWebParser: WebParser(){
 
@@ -109,53 +113,152 @@ class DuzhezWebParser: WebParser(){
         }
     }
 
+    fun getTotalPageCount(url: String, context: Context? = null): Observable<Int> {
+        return Observable.create {
+                subscriber ->
+            var doc: Document? = null
 
-    fun parseEpisodeImages(url: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
+            try {
+                doc = Jsoup.connect(url).get()
+            } catch (e: IOException) {
+                Log.d("runParserWeb", "", e)
+                subscriber.onError(e)
 
-        Log.d("parseEpisodeImages", url)
-        var doc: Document? = null
+            }
+            if(doc != null) {
+                val totalElement = doc.getElementById("total-page")
+                if(totalElement != null) {
+                    val total = totalElement.text().trim().toInt()
 
-        try {
-            doc = Jsoup.connect(url).get()
+                    if(total != null) {
+                        subscriber.onNext(total)
+                        subscriber.onComplete()
 
-        } catch (e: IOException) {
-            Log.d("parseEpisodeImages", "", e)
-            return
+                    } else {
+                        val throwable = Throwable("Can't get total page")
+                        subscriber.onError(throwable)
+                    }
+                } else {
+                    val throwable = Throwable("Can't get total page")
+                    subscriber.onError(throwable)
+                }
+            }
         }
+    }
 
-        if(doc != null) {
-            val xx = doc.toString();
-            val episodeImageData = getImageAndNextUrl(doc)
-            if(!TextUtils.isEmpty(episodeImageData.imageUrl)) {
-                imageList.add(episodeImageData.imageUrl!!)
-            } else {
-                imageList.add("error_image")
-            }
+    private var rootUrl = ""
+    private var totalCount = 0
+    private var currentIndex = 1
+    fun parseEpisodeImages(context: Context, url: String, totalCount: Int ): Observable<ArrayList<String>> {
+        this.rootUrl = url
+        this.totalCount = totalCount
+        this.currentIndex = 1
 
-            if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
-                val nextUrl = ShareFun.mergeUrl(url, episodeImageData.nextUrl!!)
-                parseEpisodeImages(nextUrl, imageList, subscriber)
-            } else {
-                imageList.add("end_image")
-            }
+        val imageList = ArrayList<String>()
+        return Observable.create {
+                subscriber ->
+            parseEpisodeImages(context, imageList, subscriber)
 
         }
     }
 
-    private fun getImageAndNextUrl(doc: Document): EpisodeImageData {
-        var imageUrl = ""
-        var nextUrl = ""
 
-        val imageElement = doc.getElementById("images")
-        if(imageElement != null) {
+    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
 
-            val imageElements = imageElement.select("img")
+        val backgroundWeb = BackgroundWeb()
 
-            if (imageElements != null && imageElements.size == 1) {
-                imageUrl = imageElements.attr("src")
+        val url = rootUrl + "?p=${currentIndex}"
+        backgroundWeb.init(context, url, object : CallbackListener {
+            override fun parseImage(urlImage: String) {
+                Log.d("parseImage", urlImage)
+                imageList.add(urlImage)
+                subscriber.onNext(imageList)
+
+                backgroundWeb.close(context)
+
+                currentIndex++
+                if(currentIndex > totalCount) {
+                    imageList.add("end_image")
+                    subscriber.onNext(imageList)
+                    subscriber.onComplete()
+                } else {
+                    parseEpisodeImages(context, imageList, subscriber )
+                }
+
+
             }
-        }
-        return EpisodeImageData(imageUrl, nextUrl)
+            override fun processHTML(string: String) {
+//                parseEpisodeImages(context, url, string, imageList, subscriber)
+            }
+        })
+
+
     }
+//    private fun parseEpisodeImages(context: Context,  url: String, html: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
+//
+//        var doc: Document? = null
+//
+//        try {
+//            doc = Jsoup.parse(html)
+//
+//        } catch (e: IOException) {
+//            Log.d("parseEpisodeImages", "", e)
+//            return
+//        }
+//
+//        if(doc != null) {
+//            val episodeImageData = getImageAndNextUrl(doc, rootUrl)
+//
+//            if(!TextUtils.isEmpty(episodeImageData.imageUrl)) {
+//                imageList.add(episodeImageData.imageUrl!!)
+//                subscriber.onNext(imageList)
+//            } else {
+//                imageList.add("error_image")
+//            }
+//
+//            if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
+//                parseEpisodeImages(context, episodeImageData.nextUrl!!, imageList, subscriber)
+//
+//            } else {
+//                imageList.add("end_image")
+//                subscriber.onComplete()
+//            }
+//
+//        }
+//    }
+//
+//    private fun getImageAndNextUrl(doc: Document, rootUrl: String): EpisodeImageData {
+//        var imageUrl = ""
+//        var nextUrl = ""
+//
+//        val pageElement = doc.getElementById("page-info")
+//        if(pageElement != null) {
+//            var text = pageElement.text()
+//            if(!TextUtils.isEmpty(text)) {
+//                text = text.replace("(", "")
+//                text = text.replace(")", "")
+//                val textArray = text.split("/")
+//                if(textArray.size == 2) {
+//                    currentIndex = textArray[0].toInt()
+//                    pageCount = textArray[1].toInt()
+//                }
+//            }
+//        }
+//
+//        val imageElement = doc.getElementById("page-$currentIndex")
+//        if(imageElement != null) {
+//            imageUrl = imageElement.attr("src")
+//        }
+//
+//        val nextIndex = currentIndex + 1
+//
+//        if(nextIndex > pageCount) {
+//            nextUrl = ""
+//        } else {
+//            nextUrl += "?p=${currentIndex + 1}"
+//        }
+//
+//        return EpisodeImageData(imageUrl, nextUrl)
+//    }
 
 }

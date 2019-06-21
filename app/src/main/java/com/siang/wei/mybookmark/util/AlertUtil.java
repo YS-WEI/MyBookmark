@@ -82,6 +82,12 @@ public class AlertUtil {
                 .setTitle(R.string.loading)
                 .setCancelable(false);
 
+        builder.setPositiveButton("停止", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
         AlertDialog dialog = builder.create();
 
        return dialog;

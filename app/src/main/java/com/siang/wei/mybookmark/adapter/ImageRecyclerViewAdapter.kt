@@ -33,6 +33,15 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
         }
 
         if (holder is ContentViewHolder) {
+//            if (holder.binding.imageView.tag != null ) {
+//                var tag =  holder.binding.imageView.tag.toString()
+//                if(!tag.equals(position.toString())) {
+//                    holder.binding.imageView.setImageDrawable(null)
+//                }
+//
+//            }
+//            holder.binding.imageView.tag = position.toString()
+            holder.binding.imageView.setImageDrawable(null)
             holder.bind(this.list[position])
         }
 
