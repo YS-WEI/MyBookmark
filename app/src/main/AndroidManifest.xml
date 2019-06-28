@@ -31,6 +31,7 @@
         <activity android:name="com.siang.wei.mybookmark.EpisodeActivity">
         </activity>
         <service android:name="com.siang.wei.mybookmark.service.ParseService" />
+        <service android:name="com.siang.wei.mybookmark.parser.service.DuzhezWebParseService" />
     </application>
 
 </manifest>

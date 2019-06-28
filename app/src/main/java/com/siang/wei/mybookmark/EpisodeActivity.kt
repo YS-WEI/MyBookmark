@@ -2,6 +2,7 @@ package com.siang.wei.mybookmark
 
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -80,8 +81,9 @@ class EpisodeActivity : AppCompatActivity() {
         setViewModel()
 
 
-
     }
+
+
 
     private fun setViewModel() {
 
@@ -98,8 +100,10 @@ class EpisodeActivity : AppCompatActivity() {
             list ->
 
             Log.d("EpisodeActivity", "update list: ${mImageList}")
-            mAdapter.setList(list)
 
+
+            mAdapter.setList(list)
+            mBinding.recyclerView.scrollToPosition(mAdapter.getPosition())
 
 
         })
@@ -117,16 +121,36 @@ class EpisodeActivity : AppCompatActivity() {
 
         mEpisodeViewModel.getParserProgressLiveData().observe(this, Observer<ParserProgress> { progress ->
 
-            if(mProgressDialog != null && mProgressDialog!!.isShowing) {
+//            if(mProgressDialog != null && mProgressDialog!!.isShowing) {
+//
+//
+//
+////                mProgressDialog!!.setTitle("${progress.current}/${progress.total}")
+//
+//            }
 
-                mProgressDialog!!.setTitle("${progress.current}/${progress.total}")
-
+            if(progress.isError) {
+                setTitle("$mTitle - error - ${progress.error} ")
+            } else {
+                if(progress.isFinish) {
+                    setTitle("$mTitle - ${progress.total}")
+                } else {
+                    setTitle("$mTitle - sync.. (${progress.current}/${progress.total})")
+                }
             }
         })
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        mEpisodeViewModel.unregisterReceiver(this)
+        mEpisodeViewModel.closeService(this)
+
+
+        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

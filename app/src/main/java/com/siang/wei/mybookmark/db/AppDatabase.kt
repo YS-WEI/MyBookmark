@@ -4,13 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.siang.wei.mybookmark.db.DatabaseKeys.Companion.DatabaseName
 import com.siang.wei.mybookmark.db.DatabaseKeys.Companion.Version
+import com.siang.wei.mybookmark.db.model.EpisodePages
 import com.siang.wei.mybookmark.db.model.Mark
 
-@Database(entities = [Mark::class], version = Version)
+@Database(entities = [Mark::class, EpisodePages::class], version = Version)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun markDao(): MarkDao
+    abstract fun episodePagesDao() : EpisodePagesDao
 
     companion object {
 
@@ -25,5 +29,10 @@ abstract class AppDatabase : RoomDatabase() {
             Room.databaseBuilder(context.applicationContext,
                 AppDatabase::class.java, DatabaseName)
                 .build()
+
     }
+
+
+
+
 }

@@ -6,8 +6,8 @@ import android.util.Log
 import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
-import com.siang.wei.mybookmark.parser.BackgroundWeb
-import com.siang.wei.mybookmark.parser.BackgroundWeb.*
+import com.siang.wei.mybookmark.parser.service.BackgroundWeb
+import com.siang.wei.mybookmark.parser.service.BackgroundWeb.*
 import com.siang.wei.mybookmark.util.ShareFun
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -16,7 +16,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
 import kotlin.collections.ArrayList
-import com.siang.wei.mybookmark.parser.BackgroundWeb.DemoJavaScriptInterface as DemoJavaScriptInterface1
+import com.siang.wei.mybookmark.parser.service.BackgroundWeb.DemoJavaScriptInterface as DemoJavaScriptInterface1
 
 class DuzhezWebParser: WebParser(){
 
@@ -149,7 +149,7 @@ class DuzhezWebParser: WebParser(){
     private var rootUrl = ""
     private var totalCount = 0
     private var currentIndex = 1
-    fun parseEpisodeImages(context: Context, url: String, totalCount: Int ): Observable<ArrayList<String>> {
+    fun parseEpisodeImages(context: Context, url: String, totalCount: Int, baseList: List<String>? = null): Observable<ArrayList<String>> {
         this.rootUrl = url
         this.totalCount = totalCount
         this.currentIndex = 1
@@ -157,41 +157,62 @@ class DuzhezWebParser: WebParser(){
         val imageList = ArrayList<String>()
         return Observable.create {
                 subscriber ->
-            parseEpisodeImages(context, imageList, subscriber)
+            parseEpisodeImages(context, imageList, baseList, subscriber)
 
         }
     }
 
 
-    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
-
+    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, baseList: List<String>? = null, subscriber: ObservableEmitter<ArrayList<String>>) {
+        var isBaseExist = false
         val backgroundWeb = BackgroundWeb()
 
         val url = rootUrl + "?p=${currentIndex}"
-        backgroundWeb.init(context, url, object : CallbackListener {
-            override fun parseImage(urlImage: String) {
-                Log.d("parseImage", urlImage)
+        if(baseList != null &&  currentIndex <= baseList.size ) {
+            val urlImage =  baseList.get(currentIndex - 1)
+            if(!TextUtils.isEmpty(urlImage) && !urlImage.equals("error_image") && !urlImage.equals("end_image")) {
+                isBaseExist = true
+
                 imageList.add(urlImage)
                 subscriber.onNext(imageList)
-
-                backgroundWeb.close(context)
-
                 currentIndex++
-                if(currentIndex > totalCount) {
+
+                if (currentIndex > totalCount) {
                     imageList.add("end_image")
                     subscriber.onNext(imageList)
                     subscriber.onComplete()
                 } else {
-                    parseEpisodeImages(context, imageList, subscriber )
+                    parseEpisodeImages(context, imageList, baseList, subscriber)
+                }
+            }
+        }
+
+        if(!isBaseExist) {
+            backgroundWeb.init(context, url, object : CallbackListener {
+                override fun parseImage(urlImage: String) {
+                    Log.d("parseImage", urlImage)
+                    imageList.add(urlImage)
+                    subscriber.onNext(imageList)
+
+                    backgroundWeb.close(context)
+
+                    currentIndex++
+                    if (currentIndex > totalCount) {
+                        imageList.add("end_image")
+                        subscriber.onNext(imageList)
+                        subscriber.onComplete()
+                    } else {
+                        parseEpisodeImages(context, imageList, baseList, subscriber)
+                    }
+
+
                 }
 
-
-            }
-            override fun processHTML(string: String) {
+                override fun processHTML(string: String) {
 //                parseEpisodeImages(context, url, string, imageList, subscriber)
-            }
-        })
-
+                }
+            })
+        }
 
     }
 //    private fun parseEpisodeImages(context: Context,  url: String, html: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {

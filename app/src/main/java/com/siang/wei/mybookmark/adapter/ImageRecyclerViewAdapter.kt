@@ -4,6 +4,7 @@ package com.siang.wei.mybookmark.adapter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.siang.wei.mybookmark.databinding.AdapterImageItemBinding
 
@@ -11,6 +12,7 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
 
     private var list : ArrayList<String> = imagelist
 
+    private var position = 0
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
@@ -26,6 +28,10 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
             return 0
     }
 
+    fun getPosition(): Int {
+        return position
+    }
+
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
         Log.d("adapter", this.list.toString())
         if(this.list == null || this.list.size == 0) {
@@ -33,14 +39,7 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
         }
 
         if (holder is ContentViewHolder) {
-//            if (holder.binding.imageView.tag != null ) {
-//                var tag =  holder.binding.imageView.tag.toString()
-//                if(!tag.equals(position.toString())) {
-//                    holder.binding.imageView.setImageDrawable(null)
-//                }
-//
-//            }
-//            holder.binding.imageView.tag = position.toString()
+            this.position = position
             holder.binding.imageView.setImageDrawable(null)
             holder.bind(this.list[position])
         }
@@ -51,6 +50,7 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
         this.list.clear()
         this.list.addAll(list)
         notifyDataSetChanged()
+
     }
 
     /**

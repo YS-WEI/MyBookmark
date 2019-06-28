@@ -4,6 +4,12 @@
 
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
+            android:id="@+id/action_sync"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:title="同步"
+            app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_add"
         android:icon="@android:drawable/ic_input_add"
         android:title="新增"

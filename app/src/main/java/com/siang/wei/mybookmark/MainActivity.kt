@@ -66,8 +66,6 @@ class MainActivity : AppCompatActivity() {
 //        mGoogleDriveService.loginGoogle(this)
         registerReceiver();
 
-        val intent = Intent(this, ParseService::class.java)
-        startService(intent)
 
     }
 
@@ -116,6 +114,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_sync -> {
+            val intent = Intent(this, ParseService::class.java)
+            startService(intent)
+            true
+        }
+
         R.id.action_add -> {
             showAddMark()
             true
