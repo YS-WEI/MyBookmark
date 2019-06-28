@@ -40,7 +40,7 @@ class ImageRecyclerViewAdapter(imagelist: ArrayList<String>) : RecyclerView.Adap
 
         if (holder is ContentViewHolder) {
             this.position = position
-            holder.binding.imageView.setImageDrawable(null)
+//            holder.binding.imageView.setImageDrawable(null)
             holder.bind(this.list[position])
         }
 

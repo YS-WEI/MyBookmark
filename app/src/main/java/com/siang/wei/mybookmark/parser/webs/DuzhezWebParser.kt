@@ -147,12 +147,12 @@ class DuzhezWebParser: WebParser(){
     }
 
     private var rootUrl = ""
-    private var totalCount = 0
-    private var currentIndex = 1
+//    private var totalCount = 0
+//    private var currentIndex = 1
     fun parseEpisodeImages(context: Context, url: String, totalCount: Int, baseList: List<String>? = null): Observable<ArrayList<String>> {
         this.rootUrl = url
-        this.totalCount = totalCount
-        this.currentIndex = 1
+//        this.totalCount = totalCount
+//        this.currentIndex = 1
 
         val imageList = ArrayList<String>()
         return Observable.create {
@@ -162,124 +162,93 @@ class DuzhezWebParser: WebParser(){
         }
     }
 
-
     fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, baseList: List<String>? = null, subscriber: ObservableEmitter<ArrayList<String>>) {
         var isBaseExist = false
         val backgroundWeb = BackgroundWeb()
 
-        val url = rootUrl + "?p=${currentIndex}"
-        if(baseList != null &&  currentIndex <= baseList.size ) {
-            val urlImage =  baseList.get(currentIndex - 1)
-            if(!TextUtils.isEmpty(urlImage) && !urlImage.equals("error_image") && !urlImage.equals("end_image")) {
-                isBaseExist = true
+        val url = rootUrl
 
-                imageList.add(urlImage)
-                subscriber.onNext(imageList)
-                currentIndex++
-
-                if (currentIndex > totalCount) {
-                    imageList.add("end_image")
-                    subscriber.onNext(imageList)
-                    subscriber.onComplete()
-                } else {
-                    parseEpisodeImages(context, imageList, baseList, subscriber)
-                }
-            }
-        }
 
         if(!isBaseExist) {
             backgroundWeb.init(context, url, object : CallbackListener {
-                override fun parseImage(urlImage: String) {
-                    Log.d("parseImage", urlImage)
-                    imageList.add(urlImage)
-                    subscriber.onNext(imageList)
+                override fun parseImage(urlImages: List<String>) {
+                    imageList.addAll(urlImages)
 
-                    backgroundWeb.close(context)
 
-                    currentIndex++
-                    if (currentIndex > totalCount) {
+//                    currentIndex++
+//                    if (currentIndex > totalCount) {
                         imageList.add("end_image")
                         subscriber.onNext(imageList)
                         subscriber.onComplete()
-                    } else {
-                        parseEpisodeImages(context, imageList, baseList, subscriber)
-                    }
+//                    } else {
+//                        parseEpisodeImages(context, imageList, baseList, subscriber)
+//                    }
 
 
                 }
 
-                override fun processHTML(string: String) {
-//                parseEpisodeImages(context, url, string, imageList, subscriber)
+                override fun error(error: String) {
+                    val throwable = Throwable(error)
+                    subscriber.onError(throwable)
                 }
             })
         }
 
     }
-//    private fun parseEpisodeImages(context: Context,  url: String, html: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
+
 //
-//        var doc: Document? = null
+//    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, baseList: List<String>? = null, subscriber: ObservableEmitter<ArrayList<String>>) {
+//        var isBaseExist = false
+//        val backgroundWeb = BackgroundWeb()
 //
-//        try {
-//            doc = Jsoup.parse(html)
+//        val url = rootUrl + "?p=${currentIndex}"
+//        if(baseList != null &&  currentIndex <= baseList.size ) {
+//            val urlImage =  baseList.get(currentIndex - 1)
+//            if(!TextUtils.isEmpty(urlImage) && !urlImage.equals("error_image") && !urlImage.equals("end_image")) {
+//                isBaseExist = true
 //
-//        } catch (e: IOException) {
-//            Log.d("parseEpisodeImages", "", e)
-//            return
-//        }
-//
-//        if(doc != null) {
-//            val episodeImageData = getImageAndNextUrl(doc, rootUrl)
-//
-//            if(!TextUtils.isEmpty(episodeImageData.imageUrl)) {
-//                imageList.add(episodeImageData.imageUrl!!)
+//                imageList.add(urlImage)
 //                subscriber.onNext(imageList)
-//            } else {
-//                imageList.add("error_image")
-//            }
+//                currentIndex++
 //
-//            if(!TextUtils.isEmpty(episodeImageData.nextUrl)) {
-//                parseEpisodeImages(context, episodeImageData.nextUrl!!, imageList, subscriber)
-//
-//            } else {
-//                imageList.add("end_image")
-//                subscriber.onComplete()
-//            }
-//
-//        }
-//    }
-//
-//    private fun getImageAndNextUrl(doc: Document, rootUrl: String): EpisodeImageData {
-//        var imageUrl = ""
-//        var nextUrl = ""
-//
-//        val pageElement = doc.getElementById("page-info")
-//        if(pageElement != null) {
-//            var text = pageElement.text()
-//            if(!TextUtils.isEmpty(text)) {
-//                text = text.replace("(", "")
-//                text = text.replace(")", "")
-//                val textArray = text.split("/")
-//                if(textArray.size == 2) {
-//                    currentIndex = textArray[0].toInt()
-//                    pageCount = textArray[1].toInt()
+//                if (currentIndex > totalCount) {
+//                    imageList.add("end_image")
+//                    subscriber.onNext(imageList)
+//                    subscriber.onComplete()
+//                } else {
+//                    parseEpisodeImages(context, imageList, baseList, subscriber)
 //                }
 //            }
 //        }
 //
-//        val imageElement = doc.getElementById("page-$currentIndex")
-//        if(imageElement != null) {
-//            imageUrl = imageElement.attr("src")
+//        if(!isBaseExist) {
+//            backgroundWeb.init(context, url, object : CallbackListener {
+//                override fun parseImage(urlImage: String) {
+//                    Log.d("parseImage", urlImage)
+//                    imageList.add(urlImage)
+//                    subscriber.onNext(imageList)
+//
+//                    backgroundWeb.close(context)
+//
+//                    currentIndex++
+//                    if (currentIndex > totalCount) {
+//                        imageList.add("end_image")
+//                        subscriber.onNext(imageList)
+//                        subscriber.onComplete()
+//                    } else {
+//                        parseEpisodeImages(context, imageList, baseList, subscriber)
+//                    }
+//
+//
+//                }
+//
+//                override fun processHTML(string: String) {
+////                parseEpisodeImages(context, url, string, imageList, subscriber)
+//                }
+//            })
 //        }
 //
-//        val nextIndex = currentIndex + 1
-//
-//        if(nextIndex > pageCount) {
-//            nextUrl = ""
-//        } else {
-//            nextUrl += "?p=${currentIndex + 1}"
-//        }
-//
-//        return EpisodeImageData(imageUrl, nextUrl)
 //    }
+
 
 }

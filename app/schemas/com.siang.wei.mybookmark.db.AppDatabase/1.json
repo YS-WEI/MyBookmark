@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "99b733a48753b1f5ec808dba08c9d0ed",
+    "identityHash": "d88b0ab9aaef44cb10cb5295e19ee465",
     "entities": [
       {
         "tableName": "Mark",
@@ -83,44 +83,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "EpisodePages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `pageUrl` TEXT NOT NULL, `content` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "pageUrl",
-            "columnName": "pageUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "content",
-            "columnName": "content",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"99b733a48753b1f5ec808dba08c9d0ed\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d88b0ab9aaef44cb10cb5295e19ee465\")"
     ]
   }
 }

@@ -78,8 +78,8 @@ class EpisodeActivity : AppCompatActivity() {
         layoutManager.orientation = VERTICAL
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = mAdapter
-        setViewModel()
 
+        setViewModel()
 
     }
 
@@ -101,7 +101,7 @@ class EpisodeActivity : AppCompatActivity() {
 
             Log.d("EpisodeActivity", "update list: ${mImageList}")
 
-
+            mBinding.recyclerView.setItemViewCacheSize(list.size)
             mAdapter.setList(list)
             mBinding.recyclerView.scrollToPosition(mAdapter.getPosition())
 
@@ -133,7 +133,7 @@ class EpisodeActivity : AppCompatActivity() {
                 setTitle("$mTitle - error - ${progress.error} ")
             } else {
                 if(progress.isFinish) {
-                    setTitle("$mTitle - ${progress.total}")
+                    setTitle("$mTitle - Pass ${progress.current}/${progress.total}")
                 } else {
                     setTitle("$mTitle - sync.. (${progress.current}/${progress.total})")
                 }
@@ -146,10 +146,6 @@ class EpisodeActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        mEpisodeViewModel.unregisterReceiver(this)
-        mEpisodeViewModel.closeService(this)
-
-
         super.onDestroy()
     }
 

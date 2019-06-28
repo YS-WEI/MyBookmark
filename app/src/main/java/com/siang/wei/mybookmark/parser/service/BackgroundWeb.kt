@@ -6,8 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.os.Build
-import android.os.Handler
-import android.os.Message
+
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -18,8 +17,8 @@ import android.webkit.*
 class BackgroundWeb {
     private lateinit var mWebView: WebView
     interface CallbackListener {
-        fun processHTML(string: String)
-        fun parseImage(urlImage: String)
+        fun error(error: String)
+        fun parseImage(urlImage: List<String>)
     }
 
     private var callback: CallbackListener? = null
@@ -59,9 +58,7 @@ class BackgroundWeb {
 
         mWebView.webViewClient = mWebClient
         mWebView.webChromeClient = mWebChromeClient
-        mWebView.addJavascriptInterface(DemoJavaScriptInterface(), "HTMLOUT")
-
-
+        mWebView.addJavascriptInterface(DemoJavaScriptInterface(), "contact")
 
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val params = WindowManager.LayoutParams(
@@ -88,10 +85,12 @@ class BackgroundWeb {
     inner class DemoJavaScriptInterface {
         @SuppressWarnings("unused")
         @JavascriptInterface
-        fun processHTML(html: String) {
-//            Log.d("BackgroundWeb", html)
+        fun showImage(urls: String) {
+            Log.d("xxxx", urls)
+            val list = urls.split(",")
             if(callback != null) {
-                callback!!.processHTML(html)
+                callback!!.parseImage(list)
+
             }
         }
     }
@@ -101,32 +100,32 @@ class BackgroundWeb {
 
         override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
 //            Mixed Content: The page at 'https://m.duzhez.com/manhua/13858/' was loaded over HTTPS, but requested an insecure image 'http://mhimg.9mmc.com:44237/images/cover/201807/153207090559513858b45e5fc6.jpg'. This content should also be served over HTTPS.
-            if(!lock  && consoleMessage != null) {
-                val message = consoleMessage.message()
-                if(message.indexOf("Mixed Content:") != -1) {
-
-                    val messages = message.split(",")
-                    if(messages.size == 2) {
-                        val string = messages[1]
-                        val strings = string.split("'")
-                        if(strings.isNotEmpty()) {
-                            strings.forEach { string ->
-                                if( string.indexOf("mhimg") != -1 && string.indexOf(".jpg") != -1) {
-                                    mWebView.stopLoading()
-                                    timeout = false
-                                    if(!lock && callback != null) {
-                                        lock = true
-                                        callback!!.parseImage(string)
-                                    }
+//            if(!lock  && consoleMessage != null) {
+//                val message = consoleMessage.message()
+//                if(message.indexOf("Mixed Content:") != -1) {
 //
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-            }
+//                    val messages = message.split(",")
+//                    if(messages.size == 2) {
+//                        val string = messages[1]
+//                        val strings = string.split("'")
+//                        if(strings.isNotEmpty()) {
+//                            strings.forEach { string ->
+//                                if( string.indexOf("mhimg") != -1 && string.indexOf(".jpg") != -1) {
+//                                    mWebView.stopLoading()
+//                                    timeout = false
+//                                    if(!lock && callback != null) {
+//                                        lock = true
+//                                        callback!!.parseImage(string)
+//                                    }
+////
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//
+//            }
 
 
             return super.onConsoleMessage(consoleMessage)
@@ -134,44 +133,51 @@ class BackgroundWeb {
         }
     }
 
-    val handler: Handler = object : Handler() {
-       override fun handleMessage(msg: Message) {
-            val str = msg.obj as String
-           Log.d("url", "error code: timeout")
-            if(str.equals("timeout")) {
-                if(!lock && callback != null) {
-                    callback!!.parseImage("error_image")
-                }
-            }
-        }
-    }
+//    val handler: Handler = object : Handler() {
+//       override fun handleMessage(msg: Message) {
+//            val str = msg.obj as String
+//           Log.d("url", "error code: timeout")
+//            if(str.equals("timeout")) {
+//                if(!lock && callback != null) {
+//                    callback!!.error("error_image")
+//                }
+//            }
+//        }
+//    }
 
     private val mWebClient: WebViewClient = object : WebViewClient() {
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
             Log.d("url", url);
-            Thread(Runnable {
-                try {
-                    Thread.sleep(20000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-
-                if (timeout) {
-                    val msg = handler.obtainMessage()
-                    msg.obj = "timeout"
-                    handler.sendMessage(msg)
-
-                }
-            }).start()
+//            Thread(Runnable {
+//                try {
+//                    Thread.sleep(20000)
+//                } catch (e: InterruptedException) {
+//                    e.printStackTrace()
+//                }
+//
+//                if (timeout) {
+//                    val msg = handler.obtainMessage()
+//                    msg.obj = "timeout"
+//                    handler.sendMessage(msg)
+//
+//                }
+//            }).start()
         }
 
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             timeout = false
-            mWebView.loadUrl("javascript:HTMLOUT.processHTML(document.documentElement.outerHTML);");
+            val string1 = "var urls = []; var count =SinMH.getChapterImageCount();"
+            val string2 = "for(var i = 1; i <= count; i++) { var url = SinMH.getChapterImage(i);  urls.push(url); }"
+            val string3 = "contact.showImage(urls.toString());"
+            mWebView.loadUrl(
+                "javascript:(function() { " +
+                        string1 + string2 + string3 +
+                        "})()");
+
         }
 
         @TargetApi(android.os.Build.VERSION_CODES.M)    //171016 处理404错误
@@ -185,7 +191,7 @@ class BackgroundWeb {
             val statusCode = errorResponse!!.statusCode
             Log.d("url", "error code: $statusCode")
             if(!lock && callback != null) {
-                callback!!.parseImage("error_image")
+                callback!!.error("error code: $statusCode")
             }
         }
 
@@ -193,7 +199,7 @@ class BackgroundWeb {
             super.onReceivedError(view, request, error)
             timeout = false
             if(!lock && callback != null) {
-                callback!!.parseImage("error_image")
+                callback!!.error("onReceivedError")
             }
         }
 

@@ -11,10 +11,9 @@ import com.siang.wei.mybookmark.db.DatabaseKeys.Companion.Version
 import com.siang.wei.mybookmark.db.model.EpisodePages
 import com.siang.wei.mybookmark.db.model.Mark
 
-@Database(entities = [Mark::class, EpisodePages::class], version = Version)
+@Database(entities = [Mark::class], version = Version)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun markDao(): MarkDao
-    abstract fun episodePagesDao() : EpisodePagesDao
 
     companion object {
 
