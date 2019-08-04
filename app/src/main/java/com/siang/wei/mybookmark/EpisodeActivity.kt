@@ -133,9 +133,9 @@ class EpisodeActivity : AppCompatActivity() {
                 setTitle("$mTitle - error - ${progress.error} ")
             } else {
                 if(progress.isFinish) {
-                    setTitle("$mTitle - Pass ${progress.current}/${progress.total}")
+                    setTitle("$mTitle - Pass ${progress.total}")
                 } else {
-                    setTitle("$mTitle - sync.. (${progress.current}/${progress.total})")
+                    setTitle("$mTitle - sync.. ${progress.total})")
                 }
             }
         })

@@ -18,7 +18,7 @@ import java.io.IOException
 import kotlin.collections.ArrayList
 import com.siang.wei.mybookmark.parser.service.BackgroundWeb.DemoJavaScriptInterface as DemoJavaScriptInterface1
 
-class DuzhezWebParser: WebParser(){
+class DuzhezWebParser: WebEpisodeParser(){
 
     val defDateFormat = "yyyy-MM-dd HH:mm"
 
@@ -112,57 +112,54 @@ class DuzhezWebParser: WebParser(){
 
         }
     }
-
-    fun getTotalPageCount(url: String, context: Context? = null): Observable<Int> {
-        return Observable.create {
-                subscriber ->
-            var doc: Document? = null
-
-            try {
-                doc = Jsoup.connect(url).get()
-            } catch (e: IOException) {
-                Log.d("runParserWeb", "", e)
-                subscriber.onError(e)
-
-            }
-            if(doc != null) {
-                val totalElement = doc.getElementById("total-page")
-                if(totalElement != null) {
-                    val total = totalElement.text().trim().toInt()
-
-                    if(total != null) {
-                        subscriber.onNext(total)
-                        subscriber.onComplete()
-
-                    } else {
-                        val throwable = Throwable("Can't get total page")
-                        subscriber.onError(throwable)
-                    }
-                } else {
-                    val throwable = Throwable("Can't get total page")
-                    subscriber.onError(throwable)
-                }
-            }
-        }
-    }
+//
+//    fun getTotalPageCount(url: String, context: Context? = null): Observable<Int> {
+//        return Observable.create {
+//                subscriber ->
+//            var doc: Document? = null
+//
+//            try {
+//                doc = Jsoup.connect(url).get()
+//            } catch (e: IOException) {
+//                Log.d("runParserWeb", "", e)
+//                subscriber.onError(e)
+//
+//            }
+//            if(doc != null) {
+//                val totalElement = doc.getElementById("total-page")
+//                if(totalElement != null) {
+//                    val total = totalElement.text().trim().toInt()
+//
+//                    if(total != null) {
+//                        subscriber.onNext(total)
+//                        subscriber.onComplete()
+//
+//                    } else {
+//                        val throwable = Throwable("Can't get total page")
+//                        subscriber.onError(throwable)
+//                    }
+//                } else {
+//                    val throwable = Throwable("Can't get total page")
+//                    subscriber.onError(throwable)
+//                }
+//            }
+//        }
+//    }
 
     private var rootUrl = ""
-//    private var totalCount = 0
-//    private var currentIndex = 1
-    fun parseEpisodeImages(context: Context, url: String, totalCount: Int, baseList: List<String>? = null): Observable<ArrayList<String>> {
+
+    override fun parseEpisodeImages(context: Context, url: String): Observable<ArrayList<String>> {
         this.rootUrl = url
-//        this.totalCount = totalCount
-//        this.currentIndex = 1
 
         val imageList = ArrayList<String>()
         return Observable.create {
                 subscriber ->
-            parseEpisodeImages(context, imageList, baseList, subscriber)
+            parseEpisodeImages(context, imageList, subscriber)
 
         }
     }
 
-    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>, baseList: List<String>? = null, subscriber: ObservableEmitter<ArrayList<String>>) {
+    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>,subscriber: ObservableEmitter<ArrayList<String>>) {
         var isBaseExist = false
         val backgroundWeb = BackgroundWeb()
 
@@ -177,9 +174,10 @@ class DuzhezWebParser: WebParser(){
 
 //                    currentIndex++
 //                    if (currentIndex > totalCount) {
-                        imageList.add("end_image")
-                        subscriber.onNext(imageList)
-                        subscriber.onComplete()
+                    imageList.add("end_image")
+                    subscriber.onNext(imageList)
+                    subscriber.onComplete()
+                    backgroundWeb.close(context);
 //                    } else {
 //                        parseEpisodeImages(context, imageList, baseList, subscriber)
 //                    }

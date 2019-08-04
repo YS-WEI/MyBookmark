@@ -1,5 +1,6 @@
 package com.siang.wei.mybookmark.parser.webs
 
+import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
@@ -9,6 +10,7 @@ import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import com.siang.wei.mybookmark.util.ShareFun
+import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

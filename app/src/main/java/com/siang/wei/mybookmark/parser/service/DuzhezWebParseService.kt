@@ -80,7 +80,7 @@
 //
 //                        listByDB = content.split(",").map { it.trim() }
 //                    }
-//                    parseAllImageForDuzhez(url, this)
+//                    parseAllImage(url, this)
 //
 //                },
 //                { error ->
@@ -112,7 +112,7 @@
 //        Log.e(SERVICE_NAME, "onDestroy")
 //    }
 //
-//    fun parseAllImageForDuzhez(url:String, context: Context) {
+//    fun parseAllImage(url:String, context: Context) {
 //        val parserUtil = DuzhezWebParser()
 //
 //

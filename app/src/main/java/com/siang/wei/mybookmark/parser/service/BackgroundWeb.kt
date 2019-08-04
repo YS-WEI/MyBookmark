@@ -5,17 +5,22 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.net.Uri
 import android.os.Build
 
 import android.text.TextUtils
+import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
 import android.webkit.*
+import com.siang.wei.mybookmark.model.WebType
+import android.R.attr.data
+import java.nio.charset.Charset
 
 
 class BackgroundWeb {
-    private lateinit var mWebView: WebView
+    private var mWebView: WebView? = null
     interface CallbackListener {
         fun error(error: String)
         fun parseImage(urlImage: List<String>)
@@ -24,13 +29,17 @@ class BackgroundWeb {
     private var callback: CallbackListener? = null
     private var lock: Boolean = false
     private var timeout: Boolean = false
+    private lateinit var inputUrl: String
+
 
     @SuppressLint("JavascriptInterface")
     fun init(context: Context, url: String, callback: CallbackListener) {
+        this.inputUrl = url
         this.callback = callback
+        this.lock = false
         mWebView = WebView(context)
 
-        val webSettings = mWebView.settings
+        val webSettings = mWebView!!.settings
         //允许js代码
         webSettings.javaScriptEnabled = true
 
@@ -56,9 +65,9 @@ class BackgroundWeb {
             webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
 
-        mWebView.webViewClient = mWebClient
-        mWebView.webChromeClient = mWebChromeClient
-        mWebView.addJavascriptInterface(DemoJavaScriptInterface(), "contact")
+        mWebView!!.webViewClient = mWebClient
+        mWebView!!.webChromeClient = mWebChromeClient
+        mWebView!!.addJavascriptInterface(DemoJavaScriptInterface(), "contact")
 
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val params = WindowManager.LayoutParams(
@@ -78,19 +87,38 @@ class BackgroundWeb {
 
         if(TextUtils.isEmpty(url) != null) {
             timeout = true
-            mWebView.loadUrl(url)
+            mWebView!!.loadUrl(url)
         }
     }
 
     inner class DemoJavaScriptInterface {
         @SuppressWarnings("unused")
         @JavascriptInterface
-        fun showImage(urls: String) {
-            Log.d("xxxx", urls)
-            val list = urls.split(",")
-            if(callback != null) {
-                callback!!.parseImage(list)
+        fun getDizhezImages(urls: String) {
+            if (!TextUtils.isEmpty(urls)) {
+                val list = urls.split(",")
+                if (!lock && list != null && list.isNotEmpty() && callback != null) {
+                    lock = true
+                    callback!!.parseImage(list)
 
+                }
+            }
+        }
+        @SuppressWarnings("unused")
+        @JavascriptInterface
+        fun getWuyouhuiImages(urlsBase64: String) {
+            if (!TextUtils.isEmpty(urlsBase64)) {
+
+               val data = Base64.decode(urlsBase64, Base64.DEFAULT)
+//                val url2 = String(Base64.decode(urlsBase64, Base64.NO_WRAP))
+                val urls = String(data, Charset.forName("UTF-8"))
+                val newUrls = urls.replace("\$qingtiandy\$", ".jpg;")
+                val list = newUrls.split(";")
+                if (!lock && callback != null) {
+                    lock = true
+                    callback!!.parseImage(list)
+
+                }
             }
         }
     }
@@ -99,84 +127,37 @@ class BackgroundWeb {
     private val mWebChromeClient: WebChromeClient = object : WebChromeClient() {
 
         override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-//            Mixed Content: The page at 'https://m.duzhez.com/manhua/13858/' was loaded over HTTPS, but requested an insecure image 'http://mhimg.9mmc.com:44237/images/cover/201807/153207090559513858b45e5fc6.jpg'. This content should also be served over HTTPS.
-//            if(!lock  && consoleMessage != null) {
-//                val message = consoleMessage.message()
-//                if(message.indexOf("Mixed Content:") != -1) {
-//
-//                    val messages = message.split(",")
-//                    if(messages.size == 2) {
-//                        val string = messages[1]
-//                        val strings = string.split("'")
-//                        if(strings.isNotEmpty()) {
-//                            strings.forEach { string ->
-//                                if( string.indexOf("mhimg") != -1 && string.indexOf(".jpg") != -1) {
-//                                    mWebView.stopLoading()
-//                                    timeout = false
-//                                    if(!lock && callback != null) {
-//                                        lock = true
-//                                        callback!!.parseImage(string)
-//                                    }
-////
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//
-//            }
-
 
             return super.onConsoleMessage(consoleMessage)
 
         }
     }
 
-//    val handler: Handler = object : Handler() {
-//       override fun handleMessage(msg: Message) {
-//            val str = msg.obj as String
-//           Log.d("url", "error code: timeout")
-//            if(str.equals("timeout")) {
-//                if(!lock && callback != null) {
-//                    callback!!.error("error_image")
-//                }
-//            }
-//        }
-//    }
-
     private val mWebClient: WebViewClient = object : WebViewClient() {
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
-            Log.d("url", url);
-//            Thread(Runnable {
-//                try {
-//                    Thread.sleep(20000)
-//                } catch (e: InterruptedException) {
-//                    e.printStackTrace()
-//                }
-//
-//                if (timeout) {
-//                    val msg = handler.obtainMessage()
-//                    msg.obj = "timeout"
-//                    handler.sendMessage(msg)
-//
-//                }
-//            }).start()
         }
 
+        override fun onLoadResource(view: WebView?, url: String?) {
+            super.onLoadResource(view, url)
+            if(!lock && mWebView != null) {
+                val type = getWebType(inputUrl)
+                when (type) {
+
+                    WebType.wuyouhui -> {
+                        getImagesbyWuyouhui()
+                    }
+                    WebType.duzhez -> {
+                        getImagesbyDizhez()
+                    }
+                }
+            }
+
+        }
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
-            timeout = false
-            val string1 = "var urls = []; var count =SinMH.getChapterImageCount();"
-            val string2 = "for(var i = 1; i <= count; i++) { var url = SinMH.getChapterImage(i);  urls.push(url); }"
-            val string3 = "contact.showImage(urls.toString());"
-            mWebView.loadUrl(
-                "javascript:(function() { " +
-                        string1 + string2 + string3 +
-                        "})()");
 
         }
 
@@ -205,13 +186,42 @@ class BackgroundWeb {
 
     }
 
+     fun getImagesbyDizhez() {
+        val string1 = "var urls = []; var count =SinMH.getChapterImageCount();"
+        val string2 = "for(var i = 1; i <= count; i++) { var url = SinMH.getChapterImage(i);  urls.push(url); }"
+        val string3 = "contact.getDizhezImages(urls.toString());"
+        mWebView!!.loadUrl(
+            "javascript:(function() { " +
+                    string1 + string2 + string3 +
+                    "})()"
+        );
+     }
+
+    fun getImagesbyWuyouhui() {
+            val string1 = "contact.getWuyouhuiImages(qTcms_S_m_murl_e);"
+            mWebView!!.loadUrl(
+                "javascript:(function() { " +
+                        string1 +
+                        "})()"
+            );
+    }
+
     fun close(context: Context) {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
+        if(mWebView != null) {
+//            mWebView!!.webChromeClient = null
+//            mWebView!!.webViewClient = null
+            mWebView!!.stopLoading()
+            mWebView!!.destroy()
+        }
         windowManager.removeView(mWebView)
+        mWebView = null;
         callback = null
 
-        mWebView.stopLoading()
-        mWebView.destroy()
+    }
+
+    fun getWebType(url: String): WebType? {
+        val uri = Uri.parse(url)
+        return WebType.domainOfEnum(uri.host)
     }
 }

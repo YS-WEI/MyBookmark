@@ -7,7 +7,9 @@ import com.siang.wei.mybookmark.db.model.Episode
 import com.siang.wei.mybookmark.db.model.EpisodeImageData
 import com.siang.wei.mybookmark.db.model.Mark
 import com.siang.wei.mybookmark.model.WebType
+import com.siang.wei.mybookmark.parser.service.BackgroundWeb
 import com.siang.wei.mybookmark.util.ShareFun
+import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -16,7 +18,7 @@ import java.util.*
 
 
 
-class WuyoyhuiWebParser: WebParser(){
+class WuyoyhuiWebParser: WebEpisodeParser(){
 
     override fun information(doc: Document, mark: Mark): Mark? {
         val defDateFormat = "MM-dd"
@@ -155,52 +157,50 @@ class WuyoyhuiWebParser: WebParser(){
     }
 
 
-    fun parseEpisodeImages(context: Context, url: String, imageList : ArrayList<String>, subscriber: ObservableEmitter<ArrayList<String>>) {
-//       val backgroundWeb = BackgroundWeb()
-//        backgroundWeb.run(context, url)
+    private var rootUrl = ""
+    override fun parseEpisodeImages(context: Context, url: String): Observable<ArrayList<String>> {
+        this.rootUrl = url
 
-//        val intent = Intent(context, BackgroundWebService::class.java)
-//        intent.putExtra(BackgroundWebService.URL_KEY, url)
-//        context.startService(intent)
+        val imageList = ArrayList<String>()
+        return Observable.create {
+                subscriber ->
+            parseEpisodeImages(context, imageList, subscriber)
+
+        }
     }
 
-    private fun getImageAndNextUrl(doc: Document): EpisodeImageData {
-        var imageUrl = ""
-        var nextUrl = ""
+    fun parseEpisodeImages(context: Context, imageList : ArrayList<String>,subscriber: ObservableEmitter<ArrayList<String>>) {
+        var isBaseExist = false
+        val backgroundWeb = BackgroundWeb()
 
-        val contentElements = doc.getElementsByClass("chapter-content")
-        if(contentElements != null) {
+        val url = rootUrl
 
-            contentElements.forEach { contentElement ->
-                val linkElements = contentElement.select("a");
 
-                linkElements.forEach { linkElement ->
-                    val text = linkElement.text()
-                    if(!TextUtils.isEmpty(text)) {
-                        if(text.equals("下一页", true)) {
+        if(!isBaseExist) {
+            backgroundWeb.init(context, url, object : BackgroundWeb.CallbackListener {
+                override fun parseImage(urlImages: List<String>) {
+                    imageList.addAll(urlImages)
 
-                            nextUrl = linkElement.attr("href")
-                            try {
-                                var uri = Uri.parse(nextUrl);
-                                if(uri.path == null) {
-                                    nextUrl = ""
-                                }
-                            } catch (e: Exception) {
-                                nextUrl = ""
-                            }
-                        }
-                    }
 
-                    val imageElements = linkElement.select("img")
+//                    currentIndex++
+//                    if (currentIndex > totalCount) {
+                    imageList.add("end_image")
+                    subscriber.onNext(imageList)
+                    subscriber.onComplete()
+                    backgroundWeb.close(context);
+//                    } else {
+//                        parseEpisodeImages(context, imageList, baseList, subscriber)
+//                    }
 
-                    if(imageElements != null && imageElements.size == 1) {
-                        imageUrl = imageElements.attr("src")
-                    }
 
                 }
-            }
+
+                override fun error(error: String) {
+                    val throwable = Throwable(error)
+                    subscriber.onError(throwable)
+                }
+            })
         }
 
-        return EpisodeImageData(imageUrl, nextUrl)
     }
 }

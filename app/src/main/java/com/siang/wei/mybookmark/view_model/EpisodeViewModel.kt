@@ -11,6 +11,9 @@ import com.siang.wei.mybookmark.model.ParserProgress
 import com.siang.wei.mybookmark.model.WebType
 import com.siang.wei.mybookmark.parser.WebParserUtils
 import com.siang.wei.mybookmark.parser.webs.DuzhezWebParser
+import com.siang.wei.mybookmark.parser.webs.WebEpisodeParser
+import com.siang.wei.mybookmark.parser.webs.WebParser
+import com.siang.wei.mybookmark.parser.webs.WuyoyhuiWebParser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -45,16 +48,14 @@ class EpisodeViewModel : ViewModel() {
         when(type) {
             WebType.duzhez -> {
                 if(context != null) {
-                    parseAllImageForDuzhez(url, context)
-//                    registerReceiver(context)
-//                    serviceIntent = Intent(context, DuzhezWebParseService::class.java)
-//                    serviceIntent!!.putExtra(DuzhezWebParseService.EXTRA_INPUT_URL, url)
-//                    context.startService(serviceIntent)
-//
-//                    val parserProgress = ParserProgress(0, 0)
-//                    parserProgressLiveData.value = parserProgress
-
-
+                    val parser = DuzhezWebParser()
+                    parseAllImage(parser, url, context)
+                }
+            }
+            WebType.wuyouhui -> {
+                if(context != null) {
+                    val parser = WuyoyhuiWebParser()
+                    parseAllImage(parser, url, context)
                 }
             }
             else -> {
@@ -81,41 +82,18 @@ class EpisodeViewModel : ViewModel() {
 
     }
 
-    fun parseAllImageForDuzhez(url:String, context: Context) {
-        val parserUtil = DuzhezWebParser()
+    fun parseAllImage(parser: WebEpisodeParser, url:String, context: Context) {
+
 
         progressDialogLiveData.value = true
-        parserUtil.getTotalPageCount(url).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ count ->
-
-                if(count != null  && count > 0) {
-                    val parserProgress = ParserProgress(count, 0)
-                    parserProgressLiveData.value = parserProgress
-                    startParseAllImageForDuzhez(context, url, count, parserUtil)
-                } else {
-                    progressDialogLiveData.value = false
-                }
-            },
-            { error ->
-                Log.e("parser", "parser fail", error)
-                progressDialogLiveData.value = false
-            })
-    }
-
-    fun startParseAllImageForDuzhez(context: Context, url:String, totalCount: Int, parser: DuzhezWebParser) {
-
-        parser.parseEpisodeImages(context, url, totalCount)
+        val disposable =  parser.parseEpisodeImages(context, url)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ list ->
 
-                val parserProgress = ParserProgress(totalCount, list.size)
-                parserProgressLiveData.value = parserProgress
-                if(list.size >= totalCount) {
-
+                if(list.size > 0) {
                     imagesLiveData.value = list
 
-                    val parserProgress = ParserProgress(totalCount, list.size, true)
+                    val parserProgress = ParserProgress(total = list.size, isFinish =  true)
                     parserProgressLiveData.value = parserProgress
                     progressDialogLiveData.value = false
                 }
@@ -132,6 +110,8 @@ class EpisodeViewModel : ViewModel() {
                     parserProgressLiveData.value = parserProgress
                     progressDialogLiveData.value = false
                 })
+
+        compositeDisposable.add(disposable)
     }
 
 
