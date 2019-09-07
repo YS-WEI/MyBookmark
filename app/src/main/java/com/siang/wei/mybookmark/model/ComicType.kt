@@ -1,7 +1,7 @@
 package com.siang.wei.mybookmark.model
 
 enum class ComicType {
-    Blood(1, "熱血"),
+    Blood(1, "一般"),
     Love(2, "戀愛");
 
     val value: Int

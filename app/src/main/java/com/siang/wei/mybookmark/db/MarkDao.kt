@@ -15,6 +15,9 @@ interface MarkDao {
     @Query("SELECT * FROM mark WHERE uid IN (:userIds)")
     fun loadAllByIds(userIds: IntArray): Flowable<List<Mark>>
 
+
+    @Query("SELECT * FROM mark WHERE comicType IN (:comicType) ORDER BY updateDate DESC")
+    fun loadAllByComicType(comicType: Int): Flowable<List<Mark>>
 //    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
 //            "last_name LIKE :last LIMIT 1")
 //    fun findByName(first: String, last: String): Mark
@@ -39,6 +42,9 @@ interface MarkDao {
 
     @Query("SELECT * FROM mark")
     fun getAllByService(): List<Mark>
+
+    @Query("SELECT * FROM mark WHERE comicType IN (:comicType)")
+    fun getAllByComicTypeByService(comicType: Int): List<Mark>
 
     @Query("DELETE FROM mark")
     fun nukeTable() : Completable

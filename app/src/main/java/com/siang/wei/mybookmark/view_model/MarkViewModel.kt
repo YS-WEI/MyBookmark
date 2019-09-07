@@ -14,6 +14,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 
 class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel() {
@@ -25,12 +26,27 @@ class MarkViewModel constructor(repository: MarkDatebaseRepository) : ViewModel(
     private var showMessageLiveData: MutableLiveData<String> = MutableLiveData()
     private var progressDialogLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
-    fun loadMadks() {
-        val disposable = repository.getMarkAll()
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(this::onFetched, this::onError);
-        compositeDisposable.add(disposable)
+    private var loadMadksDisposable : Disposable? = null
+    fun loadMadks(type: Int) {
+        if(loadMadksDisposable != null) {
+            compositeDisposable.remove(loadMadksDisposable!!)
+        }
+        if(type == 0) {
+            loadMadksDisposable = repository.getMarkAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onFetched, this::onError);
+
+            compositeDisposable.add(loadMadksDisposable!!)
+        } else {
+            loadMadksDisposable= repository.getMarkAllByComicType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onFetched, this::onError);
+
+            compositeDisposable.add(loadMadksDisposable!!)
+        }
+
     }
 
 

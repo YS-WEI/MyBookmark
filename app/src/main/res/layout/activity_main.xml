@@ -20,6 +20,25 @@
                     android:gravity="center_horizontal"
             />
         </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+            <CheckBox
+                    android:id="@+id/checkbox_type_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="一搬"/>
+
+            <CheckBox
+                    android:id="@+id/checkbox_type_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="戀愛"/>
+        </LinearLayout>
+
         <GridView
                 android:id="@+id/grid_view_marks"
                 android:layout_width="match_parent"

@@ -30,6 +30,7 @@ import android.view.Gravity
 import android.widget.Toast
 import androidx.annotation.NonNull
 import com.siang.wei.mybookmark.service.GoogleDriveService
+import com.siang.wei.mybookmark.service.ParseService.Companion.EXTRA_SNYC_TYPE
 import com.siang.wei.mybookmark.util.AlertUtil
 import com.siang.wei.mybookmark.util.PermissionUtil
 
@@ -59,7 +60,15 @@ class MainActivity : AppCompatActivity() {
         mBinding.gridViewMarks.adapter = mAdapter
         mBinding.gridViewMarks.horizontalSpacing = 20
         mBinding.gridViewMarks.onItemClickListener = mGridOnItemClickListener;
-        
+
+
+        mBinding.checkboxType1.setOnClickListener{
+            markViewModel.loadMadks(getComicType())
+        }
+
+        mBinding.checkboxType2.setOnClickListener{
+            markViewModel.loadMadks(getComicType())
+        }
 
         setViewModel()
 //        mGoogleDriveService = GoogleDriveService()
@@ -116,6 +125,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_sync -> {
             val intent = Intent(this, ParseService::class.java)
+            intent.putExtra(EXTRA_SNYC_TYPE, getComicType())
             startService(intent)
             true
         }
@@ -143,7 +153,8 @@ class MainActivity : AppCompatActivity() {
 
         viewModelFactory = Injection.provideMarkViewModelFactory(this)
         markViewModel = ViewModelProviders.of(this, viewModelFactory).get(MarkViewModel::class.java)
-        markViewModel.loadMadks()
+
+        markViewModel.loadMadks(getComicType())
 
         markViewModel.getMarksLiveData().observe(this,
             Observer<List<Mark>> { marks ->
@@ -287,5 +298,21 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun getComicType(): Int {
+        val type1IsChecked =  mBinding.checkboxType1.isChecked
+        val type2IsChecked =  mBinding.checkboxType2.isChecked
+        if( type1IsChecked && type2IsChecked) {
+            return 0
+        } else if (!type1IsChecked && type2IsChecked) {
+            return 2
+        } else if (type1IsChecked && !type2IsChecked) {
+            return 1
+        } else {
+            return 0
+        }
+
+
     }
 }

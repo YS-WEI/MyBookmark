@@ -15,6 +15,10 @@ class MarkDatebaseRepository constructor(markDao: MarkDao){
         return markDao.getAll()
     }
 
+    fun getMarkAllByComicType(type: Int) : Flowable<List<Mark>> {
+        return markDao.loadAllByComicType(type)
+    }
+
     fun insert(mark: Mark): Completable {
         return markDao.insert(mark)
     }

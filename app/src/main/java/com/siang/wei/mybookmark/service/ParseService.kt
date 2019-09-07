@@ -26,14 +26,28 @@ class ParseService: IntentService(SERVICE_NAME) {
 
         val EXTRA_TOTLE_SIZE = "EXTRA_TOTLE_SIZE"
         val EXTRA_CURRENT_NUMBER = "EXTRA_CURRENT_NUMBER"
+
+        val EXTRA_SNYC_TYPE = "EXTRA_SNYC_TYPE"
     }
 
 
 
     override fun onHandleIntent(intent: Intent?) {
+        var comicType = 0
+        if(intent != null && intent.hasExtra(EXTRA_SNYC_TYPE)) {
+            comicType = intent.getIntExtra(EXTRA_SNYC_TYPE, 0)
+        }
+
         val database = AppDatabase.getInstance(this);
         val markDao = database.markDao();
-        val marks = markDao.getAllByService();
+
+        var marks: List<Mark>
+        if(comicType != 0) {
+            marks = markDao.getAllByComicTypeByService(comicType)
+        } else {
+            marks = markDao.getAllByService()
+        }
+
         var count = 0
         marks.forEach { mark -> run{
             count++
