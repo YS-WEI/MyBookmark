@@ -63,7 +63,10 @@ object WebParserUtils {
                 val parser = WuyoyhuiWebParser()
                 return parser.information(doc, mark)
             }
-
+            WebType.m17kmanhua ->  run {
+                val parser = M17KWebParser()
+                return parser.information(doc, mark)
+            }
             else -> return mark
         }
 
@@ -131,6 +134,10 @@ object WebParserUtils {
             WebType.wuyouhui ->  run {
                 val parser = WuyoyhuiWebParser()
                 list = parser.episode(doc)
+            }
+            WebType.m17kmanhua -> run{
+                val parser = M17KWebParser()
+                list = parser.episode(doc!!)
             }
             else -> list = null
         }

@@ -8,7 +8,8 @@ enum class WebType {
     mhkan("m.mhkan.com", "漫画看",R.color.web_type_mhkan),
     manhuagui("m.manhuagui.com", "看漫画",R.color.web_type_manhuagui),
     duzhez("wap.93gmh.com", "亲亲漫画", R.color.web_type_duzhez),
-    wuyouhui("m.wuyouhui.net", "友绘漫画", R.color.web_type_wuyouhui);
+    wuyouhui("m.wuyouhui.net", "友绘漫画", R.color.web_type_wuyouhui),
+    m17kmanhua("m.17kmanhua.com", "17k漫画", R.color.web_type_17k);
 
     val domain: String
     val webName: String
